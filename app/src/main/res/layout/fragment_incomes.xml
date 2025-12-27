@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="16dp">
+
+    <!-- Fragment Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Income"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#03A9F4"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Toggle Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnCustomer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Customers"
+            android:backgroundTint="#03A9F4"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/btnOthers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Others"
+            android:backgroundTint="#03A9F4"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- Scrollable form -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/formContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Customer Fields -->
+            <LinearLayout
+                android:id="@+id/customerFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Customer Full Name">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCustomerName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Name"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Phone Number">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCustomerPhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Phone"
+                        android:inputType="phone"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Email Address">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCustomerEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Email"
+                        android:inputType="textEmailAddress"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Product Name or Service">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Product"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Amount received in USD">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCustomerAmount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Amount"
+                        android:inputType="numberDecimal"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Select Payment Date">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCustomerDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Date"
+                        android:focusable="false"
+                        android:drawableEnd="@android:drawable/ic_menu_today"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Optional notes">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCustomerNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Notes"
+                        android:inputType="textMultiLine"
+                        android:minLines="2"
+                        android:maxLines="4"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Others Fields -->
+            <LinearLayout
+                android:id="@+id/othersFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Source Description">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etOtherSource"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Source"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Amount received in USD">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etOtherAmount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Amount"
+                        android:inputType="numberDecimal"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Select Date">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etOtherDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Date"
+                        android:focusable="false"
+                        android:drawableEnd="@android:drawable/ic_menu_today"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Optional notes">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etOtherNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Notes"
+                        android:inputType="textMultiLine"
+                        android:minLines="2"
+                        android:maxLines="4"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/btnSaveIncome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save Income"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#03A9F4"
+                android:textColor="#FFFFFF"
+                android:textAllCaps="false"/>
+
+            <!-- Show Table Button -->
+            <Button
+                android:id="@+id/btnShowIncomeTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Incomes Table"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#03A9F4"
+                android:textColor="#FFFFFF"
+                android:textAllCaps="false"/>
+
+            <!-- RecyclerView for table -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvIncomes"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_marginTop="16dp"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
