@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">BillingManagementSystem</string>
+
+    <!-- Add this Array -->
+    <string-array name="expense_categories">
+        <item>Select Category</item>
+        <item>Food</item>
+        <item>Transport</item>
+        <item>Utilities</item>
+        <item>Rent</item>
+        <item>Medical</item>
+        <item>Entertainment</item>
+        <item>Others</item>
+    </string-array>
+
 </resources>
