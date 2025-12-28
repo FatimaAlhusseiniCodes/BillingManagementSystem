@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/homeFragment" android:title="Home Dashboard" />
+    <item android:id="@+id/invoiceFragment" android:title="Invoice Management" />
+    <item android:id="@+id/salesReceiptFragment" android:title="Sales Receipts" />
+    <item android:id="@+id/paymentsReceivedFragment" android:title="Payments" />
+</menu>

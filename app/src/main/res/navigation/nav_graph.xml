@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <!-- HOME FRAGMENT - Starting Destination -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.billingmanagementsystem.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <!-- INVOICE FRAGMENT -->
+    <fragment
+        android:id="@+id/invoiceFragment"
+        android:name="com.example.billingmanagementsystem.InvoiceFragment"
+        android:label="Invoices"
+        tools:layout="@layout/fragment_invoice">
+
+        <!-- Action to navigate from Invoice List to Add Invoice -->
+        <action
+            android:id="@+id/action_invoiceFragment_to_addInvoiceFragment"
+            app:destination="@id/addInvoiceFragment" />
+    </fragment>
+
+    <!-- ADD INVOICE FRAGMENT -->
+    <fragment
+        android:id="@+id/addInvoiceFragment"
+        android:name="com.example.billingmanagementsystem.AddInvoiceFragment"
+        android:label="Create Invoice"
+        tools:layout="@layout/fragment_add_invoice" />
+
+    <!-- SALES RECEIPT FRAGMENT -->
+    <fragment
+        android:id="@+id/salesReceiptFragment"
+        android:name="com.example.billingmanagementsystem.SalesReceiptFragment"
+        android:label="Sales Receipt"
+        tools:layout="@layout/fragment_sales_receipt" />
+
+    <!-- PAYMENTS RECEIVED FRAGMENT -->
+    <fragment
+        android:id="@+id/paymentsReceivedFragment"
+        android:name="com.example.billingmanagementsystem.PaymentsReceivedFragment"
+        android:label="Payments Received"
+        tools:layout="@layout/fragment_payments_received" />
+
+    <!--
+    TODO: Add more fragments here when your team finishes UI:
+    - partnersFragment
+    - incomesFragment
+    - expensesFragment
+    - profitsFragment
+    - profileFragment
+    - settingsFragment
+    -->
+
+</navigation>
