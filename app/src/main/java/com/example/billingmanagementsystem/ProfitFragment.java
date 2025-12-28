@@ -1,4 +1,4 @@
-package com.example.billingmanagmenetsystem;
+package com.example.billingmanagementsystem;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;

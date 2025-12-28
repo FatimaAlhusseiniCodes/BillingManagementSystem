@@ -50,7 +50,7 @@ public class AddInvoiceFragment extends Fragment {
     private Calendar dueCalendar;
     private SimpleDateFormat dateFormatter;
     private DecimalFormat decimalFormat;
-    private int currentInvoiceNumber = 1; // This would come from database in real app
+    private final int  currentInvoiceNumber = 1; // This would come from database in real app
 
     @Nullable
     @Override
@@ -99,7 +99,7 @@ public class AddInvoiceFragment extends Fragment {
         radioGroupInvoiceType = view.findViewById(R.id.radioGroupInvoiceType);
         editTextInvoiceNumber = view.findViewById(R.id.editTextInvoiceNumber);
         autoCompletePartner = view.findViewById(R.id.autoCompletePartner);
-        partnerInputLayout = view.findViewById(R.id.autoCompletePartner).getParent().getParent();
+        partnerInputLayout = view.findViewById(R.id.partnerInputLayout);
         editTextInvoiceDate = view.findViewById(R.id.editTextInvoiceDate);
         editTextDueDate = view.findViewById(R.id.editTextDueDate);
         autoCompleteStatus = view.findViewById(R.id.autoCompleteStatus);
@@ -207,8 +207,10 @@ public class AddInvoiceFragment extends Fragment {
 
     private void calculateTotalAmount() {
         try {
-            String rateStr = editTextRate.getText().toString().trim();
-            String quantityStr = editTextQuantity.getText().toString().trim();
+            String rateStr = editTextRate.getText() != null ?
+                    editTextRate.getText().toString().trim() : "";
+            String quantityStr = editTextRate.getText() != null ?
+                    editTextRate.getText().toString().trim() : "";
 
             if (!rateStr.isEmpty() && !quantityStr.isEmpty()) {
                 double rate = Double.parseDouble(rateStr);
@@ -273,9 +275,11 @@ public class AddInvoiceFragment extends Fragment {
         // Collect data
         String invoiceType = radioGroupInvoiceType.getCheckedRadioButtonId() == R.id.radioSales
                 ? "Sales" : "Purchase";
-        String invoiceNumber = editTextInvoiceNumber.getText().toString().trim();
+        String invoiceNumber = editTextRate.getText() != null ?
+                editTextRate.getText().toString().trim() : "";
         String partner = autoCompletePartner.getText().toString().trim();
-        String invoiceDate = editTextInvoiceDate.getText().toString().trim();
+        String invoiceDate =editTextRate.getText() != null ?
+                editTextRate.getText().toString().trim() : "";
         String dueDate = editTextDueDate.getText().toString().trim();
         String status = autoCompleteStatus.getText().toString().trim();
         String rateStr = editTextRate.getText().toString().trim();

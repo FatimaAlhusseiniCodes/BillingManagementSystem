@@ -1,4 +1,4 @@
-package com.example.billingmanagmenetsystem;
+package com.example.billingmanagementsystem;
 
 public class Expense {
     private String title;

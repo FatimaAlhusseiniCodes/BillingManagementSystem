@@ -1,4 +1,4 @@
-package com.example.billingmanagmenetsystem;
+package com.example.billingmanagementsystem;
 
 import java.util.ArrayList;
 

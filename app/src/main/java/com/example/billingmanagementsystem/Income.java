@@ -1,4 +1,4 @@
-package com.example.billingmanagmenetsystem;
+package com.example.billingmanagementsystem;
 
 public class Income {
     private String type; // "Customer" or "Other"
