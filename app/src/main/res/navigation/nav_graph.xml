@@ -1,59 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/loginFragment">
 
-    <!-- HOME FRAGMENT - Starting Destination -->
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.billingmanagementsystem.LoginFragment"
+        android:label="Login">
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Home -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.billingmanagementsystem.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home" />
+        android:label="Home">
 
-    <!-- INVOICE FRAGMENT -->
-    <fragment
-        android:id="@+id/invoiceFragment"
-        android:name="com.example.billingmanagementsystem.InvoiceFragment"
-        android:label="Invoices"
-        tools:layout="@layout/fragment_invoice">
-
-        <!-- Action to navigate from Invoice List to Add Invoice -->
         <action
-            android:id="@+id/action_invoiceFragment_to_addInvoiceFragment"
-            app:destination="@id/addInvoiceFragment" />
+            android:id="@+id/action_home_to_newInvoice"
+            app:destination="@id/newInvoiceFragment" />
+
+        <action
+            android:id="@+id/action_home_to_newPartner"
+            app:destination="@id/newPartnerFragment" />
+
+        <action
+            android:id="@+id/action_home_to_expenses"
+            app:destination="@id/expensesFragment" />
+
+        <action
+            android:id="@+id/action_home_to_income"
+            app:destination="@id/incomeFragment" />
     </fragment>
 
-    <!-- ADD INVOICE FRAGMENT -->
+    <!-- New Invoice -->
     <fragment
-        android:id="@+id/addInvoiceFragment"
-        android:name="com.example.billingmanagementsystem.AddInvoiceFragment"
-        android:label="Create Invoice"
-        tools:layout="@layout/fragment_add_invoice" />
+        android:id="@+id/newInvoiceFragment"
+        android:name="com.example.billingmanagementsystem.InvoiceFragment"
+        android:label="New Invoice" />
 
-    <!-- SALES RECEIPT FRAGMENT -->
+    <!-- New Partner -->
     <fragment
-        android:id="@+id/salesReceiptFragment"
-        android:name="com.example.billingmanagementsystem.SalesReceiptFragment"
-        android:label="Sales Receipt"
-        tools:layout="@layout/fragment_sales_receipt" />
+        android:id="@+id/newPartnerFragment"
+        android:name="com.example.billingmanagementsystem.PartnerFragment"
+        android:label="New Partner" />
 
-    <!-- PAYMENTS RECEIVED FRAGMENT -->
+    <!-- Expenses -->
     <fragment
-        android:id="@+id/paymentsReceivedFragment"
-        android:name="com.example.billingmanagementsystem.PaymentsReceivedFragment"
-        android:label="Payments Received"
-        tools:layout="@layout/fragment_payments_received" />
+        android:id="@+id/expensesFragment"
+        android:name="com.example.billingmanagementsystem.ExpensesFragment"
+        android:label="Expenses" />
 
-    <!--
-    TODO: Add more fragments here when your team finishes UI:
-    - partnersFragment
-    - incomesFragment
-    - expensesFragment
-    - profitsFragment
-    - profileFragment
-    - settingsFragment
-    -->
+    <!-- Income -->
+    <fragment
+        android:id="@+id/incomeFragment"
+        android:name="com.example.billingmanagementsystem.IncomeFragment"
+        android:label="Income" />
+
+
 
 </navigation>
