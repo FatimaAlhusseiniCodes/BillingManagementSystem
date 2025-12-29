@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,32 +14,24 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
-public class InvoiceFragment extends Fragment {
+public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoiceClickListener {
 
     private TabLayout tabLayout;
     private RecyclerView recyclerView;
     private FloatingActionButton fabAddInvoice;
+    private LinearLayout layoutEmptyState;
+
     private InvoiceAdapter adapter;
     private List<Invoice> allInvoices;
-
-    // YOUR API ENDPOINT
-    private static final String API_URL = "http://your-server.com/api/invoices";
+    private String currentFilter = "Unpaid"; // Default tab
 
     @Nullable
     @Override
@@ -55,108 +48,33 @@ public class InvoiceFragment extends Fragment {
         tabLayout = view.findViewById(R.id.tabLayout);
         recyclerView = view.findViewById(R.id.rv_invoices);
         fabAddInvoice = view.findViewById(R.id.fab_add_invoice);
+        layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
 
         // Setup RecyclerView
         setupRecyclerView();
 
-        // Load REAL data from database
-        loadInvoicesFromAPI();
+        // Load invoices
+        loadInvoices();
 
         // Setup tabs
         setupTabs();
 
-        // Setup FAB click
+        // Setup FAB
         setupFAB();
     }
 
     private void setupRecyclerView() {
-        adapter = new InvoiceAdapter(invoice -> {
-            // Handle invoice item click
-            Toast.makeText(requireContext(),
-                    "Clicked: " + invoice.getInvoiceNumber(),
-                    Toast.LENGTH_SHORT).show();
-        });
-
+        adapter = new InvoiceAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
     }
 
-    private void loadInvoicesFromAPI() {
-        allInvoices = new ArrayList<>();
+    private void loadInvoices() {
+        // TODO: Replace with actual database/API call
+        allInvoices = getSampleInvoices();
 
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                API_URL,
-                null,
-                response -> {
-                    try {
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject json = response.getJSONObject(i);
-
-                            // Parse REAL data from database
-                            Invoice invoice = new Invoice(
-                                    json.getString("id"),
-                                    json.getString("invoice_number"),
-                                    json.getString("partner_name"),      // ← REAL
-                                    json.getString("invoice_date"),
-                                    json.getString("due_date"),
-                                    json.getDouble("total_amount"),      // ← REAL
-                                    json.getDouble("due_amount"),
-                                    json.getInt("quantity"),
-                                    json.getString("status"),
-                                    calculateOverdue(json.getString("due_date")),
-                                    calculateOverdueDays(json.getString("due_date"))
-                            );
-
-                            allInvoices.add(invoice);
-                        }
-
-                        // Display unpaid invoices by default
-                        filterInvoices("Unpaid");
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(requireContext(),
-                                "Error parsing data",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                },
-                error -> {
-                    Toast.makeText(requireContext(),
-                            "Error loading invoices: " + error.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                }
-        );
-
-        RequestQueue queue = Volley.newRequestQueue(requireContext());
-        queue.add(request);
-    }
-
-    private boolean calculateOverdue(String dueDateStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
-            Date dueDate = sdf.parse(dueDateStr);
-            Date today = new Date();
-            return today.after(dueDate);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private int calculateOverdueDays(String dueDateStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
-            Date dueDate = sdf.parse(dueDateStr);
-            Date today = new Date();
-
-            if (today.after(dueDate)) {
-                long diff = today.getTime() - dueDate.getTime();
-                return (int) (diff / (1000 * 60 * 60 * 24));
-            }
-            return 0;
-        } catch (Exception e) {
-            return 0;
-        }
+        // Filter and display
+        filterInvoices(currentFilter);
     }
 
     private void setupTabs() {
@@ -165,16 +83,13 @@ public class InvoiceFragment extends Fragment {
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
                 switch (position) {
-                    case 0: // Unpaid
-                        filterInvoices("Unpaid");
-                        break;
-                    case 1: // Paid
-                        filterInvoices("Paid");
-                        break;
-                    case 2: // All
-                        filterInvoices("All");
-                        break;
+                    case 0: currentFilter = "Unpaid"; break;
+                    case 1: currentFilter = "Paid"; break;
+                    case 2: currentFilter = "Sales"; break;
+                    case 3: currentFilter = "Purchase"; break;
+                    case 4: currentFilter = "All"; break;
                 }
+                filterInvoices(currentFilter);
             }
 
             @Override
@@ -188,30 +103,151 @@ public class InvoiceFragment extends Fragment {
     private void filterInvoices(String filter) {
         List<Invoice> filteredList = new ArrayList<>();
 
-        if (filter.equals("All")) {
-            filteredList.addAll(allInvoices);
-        } else if (filter.equals("Paid")) {
-            for (Invoice invoice : allInvoices) {
-                if (invoice.getStatus().equals("Paid")) {
-                    filteredList.add(invoice);
-                }
+        for (Invoice invoice : allInvoices) {
+            boolean matches = false;
+
+            switch (filter) {
+                case "Unpaid":
+                    matches = invoice.getStatus().equals("Unpaid") ||
+                            invoice.getStatus().equals("Partially Paid");
+                    break;
+                case "Paid":
+                    matches = invoice.getStatus().equals("Paid");
+                    break;
+                case "Sales":
+                    matches = invoice.getType().equals("Sales");
+                    break;
+                case "Purchase":
+                    matches = invoice.getType().equals("Purchase");
+                    break;
+                case "All":
+                    matches = true;
+                    break;
             }
-        } else if (filter.equals("Unpaid")) {
-            for (Invoice invoice : allInvoices) {
-                if (invoice.getStatus().equals("Unpaid") ||
-                        invoice.getStatus().equals("Partially Paid")) {
-                    filteredList.add(invoice);
-                }
+
+            if (matches) {
+                filteredList.add(invoice);
             }
         }
 
         adapter.setInvoices(filteredList);
+
+        if (filteredList.isEmpty()) {
+            layoutEmptyState.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            layoutEmptyState.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setupFAB() {
         fabAddInvoice.setOnClickListener(v -> {
             NavHostFragment.findNavController(InvoiceFragment.this)
-                    .navigate(R.id.action_invoiceFragment_to_addInvoiceFragment);
+                    .navigate(R.id.addInvoiceFragment);
         });
+    }
+
+    // ==================== OnInvoiceClickListener Implementation ====================
+
+    @Override
+    public void onInvoiceClick(Invoice invoice) {
+        // TODO: Navigate to invoice details or show options
+        Toast.makeText(requireContext(),
+                "Invoice: " + invoice.getInvoiceNumber(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMarkAsPaidClick(Invoice invoice) {
+        // Mark invoice as paid
+        invoice.markAsPaid();
+
+        // TODO: Update in database
+
+        // Refresh display
+        filterInvoices(currentFilter);
+
+        // Show confirmation
+        Snackbar.make(requireView(),
+                "Invoice marked as paid!",
+                Snackbar.LENGTH_SHORT).show();
+    }
+
+    // ==================== Sample Data ====================
+
+    private List<Invoice> getSampleInvoices() {
+        List<Invoice> invoices = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+
+        // Sample Invoice 1 - Sales, Unpaid, Overdue
+        cal.set(2024, Calendar.DECEMBER, 1);
+        long issue1 = cal.getTimeInMillis();
+        cal.set(2024, Calendar.DECEMBER, 15);
+        long due1 = cal.getTimeInMillis();
+
+        invoices.add(new Invoice(
+                "1", "INV-0001", "ABC Company", 1,
+                issue1, due1,
+                1500.00, 0.00, 1500.00,
+                0.00, 1500.00,
+                "Unpaid", "Sales",
+                10.0, 150.0,
+                true, 15,
+                ""
+        ));
+
+        // Sample Invoice 2 - Purchase, Paid
+        cal.set(2024, Calendar.NOVEMBER, 10);
+        long issue2 = cal.getTimeInMillis();
+        cal.set(2024, Calendar.DECEMBER, 10);
+        long due2 = cal.getTimeInMillis();
+
+        invoices.add(new Invoice(
+                "2", "INV-0002", "XYZ Suppliers", 2,
+                issue2, due2,
+                2500.00, 0.00, 2500.00,
+                2500.00, 0.00,
+                "Paid", "Purchase",
+                25.0, 100.0,
+                false, 0,
+                ""
+        ));
+
+        // Sample Invoice 3 - Sales, Unpaid
+        cal.set(2024, Calendar.DECEMBER, 20);
+        long issue3 = cal.getTimeInMillis();
+        cal.set(2025, Calendar.JANUARY, 20);
+        long due3 = cal.getTimeInMillis();
+
+        invoices.add(new Invoice(
+                "3", "INV-0003", "Tech Corp", 3,
+                issue3, due3,
+                3200.50, 0.00, 3200.50,
+                0.00, 3200.50,
+                "Unpaid", "Sales",
+                20.0, 160.025,
+                false, 0,
+                ""
+        ));
+
+        // Sample Invoice 4 - Purchase, Partially Paid, Overdue
+        cal.set(2024, Calendar.NOVEMBER, 25);
+        long issue4 = cal.getTimeInMillis();
+        cal.set(2024, Calendar.DECEMBER, 25);
+        long due4 = cal.getTimeInMillis();
+
+        invoices.add(new Invoice(
+                "4", "INV-0004", "Office Supplies Ltd", 4,
+                issue4, due4,
+                5000.00, 0.00, 5000.00,
+                2500.00, 2500.00,
+                "Partially Paid", "Purchase",
+                50.0, 100.0,
+                true, 5,
+                ""
+        ));
+
+        return invoices;
     }
 }

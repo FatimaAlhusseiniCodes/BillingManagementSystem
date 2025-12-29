@@ -4,187 +4,223 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    android:fillViewport="true"
-    android:padding="16dp">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- CARD 1: Header + quick actions -->
-        <androidx.cardview.widget.CardView
+        <!-- Header Card: Business Name + Welcome -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             app:cardCornerRadius="12dp"
-            app:cardUseCompatPadding="true"
-            app:cardElevation="4dp">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#1976D2">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
-                <!-- Top Section -->
                 <TextView
+                    android:id="@+id/tvBusinessName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Business name"
+                    android:text="My Business"
                     android:textSize="24sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="4dp" />
 
                 <TextView
                     android:id="@+id/tvWelcome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Welcome Fatima alhusseini"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:text="Welcome, User"
+                    android:textSize="18sp"
+                    android:textColor="#BBDEFB"
                     android:layout_marginBottom="4dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Here's your organization's overview"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
+                    android:textColor="#E3F2FD" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Quick Actions Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quick Actions"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
                     android:layout_marginBottom="16dp" />
 
-                <!-- Quick actions row -->
+                <!-- Quick Action Buttons Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:weightSum="4"
-                    android:gravity="center_horizontal"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp">
+                    android:gravity="center">
 
                     <!-- New Invoice -->
                     <LinearLayout
+                        android:id="@+id/btnNewInvoice"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center_horizontal">
+                        android:gravity="center_horizontal"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
 
-                        <ImageButton
-                            android:id="@+id/btnNewInvoice"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/circle_bg"
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:src="@drawable/ic_invoice"
-                            android:contentDescription="@string/app_name"
-                            android:padding="12dp" />
+                            android:background="@drawable/circle_bg"
+                            android:padding="12dp"
+                            android:contentDescription="New Invoice" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="New Invoice"
-                            android:textSize="14sp"
+                            android:text="New\nInvoice"
+                            android:textSize="12sp"
                             android:textAlignment="center"
-                            android:singleLine="true"
-                            android:maxLines="1"
-                            android:layout_marginTop="8dp" />
+                            android:gravity="center"
+                            android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <!-- New Partner -->
                     <LinearLayout
+                        android:id="@+id/btnNewPartner"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center_horizontal">
+                        android:gravity="center_horizontal"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
 
-                        <ImageButton
-                            android:id="@+id/btnNewPartner"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/circle_bg"
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:src="@drawable/ic_partner"
-                            android:contentDescription="@string/app_name"
-                            android:padding="12dp" />
+                            android:background="@drawable/circle_bg"
+                            android:padding="12dp"
+                            android:contentDescription="New Partner" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="New Partner"
-                            android:textSize="14sp"
+                            android:text="New\nPartner"
+                            android:textSize="12sp"
                             android:textAlignment="center"
-                            android:singleLine="true"
-                            android:maxLines="1"
-                            android:layout_marginTop="8dp" />
+                            android:gravity="center"
+                            android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <!-- New Expense -->
                     <LinearLayout
+                        android:id="@+id/btnNewExpense"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center_horizontal">
+                        android:gravity="center_horizontal"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
 
-                        <ImageButton
-                            android:id="@+id/btnExpenses"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/circle_bg"
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:src="@drawable/ic_expense"
-                            android:contentDescription="@string/app_name"
-                            android:padding="12dp" />
+                            android:background="@drawable/circle_bg"
+                            android:padding="12dp"
+                            android:contentDescription="New Expense" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="New Expense"
-                            android:textSize="14sp"
+                            android:text="New\nExpense"
+                            android:textSize="12sp"
                             android:textAlignment="center"
-                            android:singleLine="true"
-                            android:maxLines="1"
-                            android:layout_marginTop="8dp" />
+                            android:gravity="center"
+                            android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <!-- New Income -->
                     <LinearLayout
+                        android:id="@+id/btnNewIncome"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center_horizontal">
+                        android:gravity="center_horizontal"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
 
-                        <ImageButton
-                            android:id="@+id/btnIncome"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/circle_bg"
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:src="@drawable/ic_income"
-                            android:contentDescription="@string/app_name"
-                            android:padding="12dp" />
+                            android:background="@drawable/circle_bg"
+                            android:padding="12dp"
+                            android:contentDescription="New Income" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="New Income"
-                            android:textSize="14sp"
+                            android:text="New\nIncome"
+                            android:textSize="12sp"
                             android:textAlignment="center"
-                            android:singleLine="true"
-                            android:maxLines="1"
-                            android:layout_marginTop="8dp" />
+                            android:gravity="center"
+                            android:layout_marginTop="4dp" />
                     </LinearLayout>
+
                 </LinearLayout>
-
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- CARD 2: Upcoming Payments -->
-        <androidx.cardview.widget.CardView
+        <!-- Upcoming Payments Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
             app:cardCornerRadius="12dp"
-            app:cardUseCompatPadding="true"
             app:cardElevation="4dp">
 
             <LinearLayout
@@ -196,70 +232,41 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Upcoming Payments"
+                    android:text="Upcoming Payments (Next 5)"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    android:textColor="#212121"
                     android:layout_marginBottom="12dp" />
 
-                <!-- One upcoming payment item (filled from code) -->
+                <!-- Payment items will be added dynamically -->
                 <LinearLayout
+                    android:id="@+id/layoutUpcomingPayments"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- Empty state (shown if no payments) -->
                     <TextView
-                        android:id="@+id/tvUpcomingSupplierName"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvNoUpcomingPayments"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Supplier Name"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvUpcomingSupplierEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="supplier@example.com"
+                        android:text="No upcoming payments"
                         android:textSize="14sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textColor="#757575"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:visibility="gone" />
 
-                    <!-- Total and Overdue: same line, separated -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvUpcomingTotal"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Total: ALL 1,500.00"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:id="@+id/tvUpcomingOverdue"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="Overdue: 2025-01-10"
-                            android:textSize="15sp" />
-                    </LinearLayout>
                 </LinearLayout>
-
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- CARD 3: Profit (last 5 months) -->
-        <androidx.cardview.widget.CardView
+        <!-- Profit (Last 5 Months) Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
             app:cardCornerRadius="12dp"
-            app:cardUseCompatPadding="true"
             app:cardElevation="4dp">
 
             <LinearLayout
@@ -271,302 +278,34 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Profit (last 5 months)"
+                    android:text="Profit (Last 5 Months)"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    android:textColor="#212121"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Month 1 -->
+                <!-- Profit items will be added dynamically -->
                 <LinearLayout
-                    android:id="@+id/layoutMonth1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth1Name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Month 1"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvMonth1Profit"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="+ ALL 0.00"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth1Income"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Total income: ALL 0.00"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tvMonth1Expenses"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="Total expenses: ALL 0.00"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Month 2 -->
-                <LinearLayout
-                    android:id="@+id/layoutMonth2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth2Name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Month 2"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvMonth2Profit"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="+ ALL 0.00"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth2Income"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Total income: ALL 0.00"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tvMonth2Expenses"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="Total expenses: ALL 0.00"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Month 3 -->
-                <LinearLayout
-                    android:id="@+id/layoutMonth3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth3Name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Month 3"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvMonth3Profit"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="+ ALL 0.00"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth3Income"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Total income: ALL 0.00"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tvMonth3Expenses"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="Total expenses: ALL 0.00"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Month 4 -->
-                <LinearLayout
-                    android:id="@+id/layoutMonth4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth4Name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Month 4"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvMonth4Profit"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="+ ALL 0.00"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth4Income"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Total income: ALL 0.00"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tvMonth4Expenses"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="Total expenses: ALL 0.00"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Month 5 -->
-                <LinearLayout
-                    android:id="@+id/layoutMonth5"
+                    android:id="@+id/layoutProfitMonths"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <LinearLayout
+                    <!-- Empty state (shown if no data) -->
+                    <TextView
+                        android:id="@+id/tvNoProfitData"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
+                        android:text="No profit data available"
+                        android:textSize="14sp"
+                        android:textColor="#757575"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:visibility="gone" />
 
-                        <TextView
-                            android:id="@+id/tvMonth5Name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Month 5"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvMonth5Profit"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="+ ALL 0.00"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
-
-                        <TextView
-                            android:id="@+id/tvMonth5Income"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Total income: ALL 0.00"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tvMonth5Expenses"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="Total expenses: ALL 0.00"
-                            android:textSize="14sp" />
-                    </LinearLayout>
                 </LinearLayout>
-
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>

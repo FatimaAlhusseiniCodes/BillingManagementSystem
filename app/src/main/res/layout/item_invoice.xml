@@ -6,8 +6,9 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
     android:layout_marginVertical="6dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,11 +16,48 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Row 1: Partner Name and Total Amount -->
+        <!-- Row 1: Status Badge and Type Badge -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <!-- Status Badge (Paid/Unpaid/Partially Paid) -->
+            <TextView
+                android:id="@+id/textViewStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UNPAID"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="#F44336"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Type Badge (Sales/Purchase) -->
+            <TextView
+                android:id="@+id/textViewType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SALES"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="#2196F3"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp" />
+
+        </LinearLayout>
+
+        <!-- Row 2: Partner Name and Total Amount -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
             <!-- Partner Name (Left) -->
             <TextView
@@ -27,8 +65,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Mr. Mahdi Bazzoun"
-                android:textColor="#000000"
+                android:text="Partner Name"
+                android:textColor="#212121"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:ellipsize="end"
@@ -39,20 +77,20 @@
                 android:id="@+id/textViewTotalAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ALL1,500.00"
-                android:textColor="#000000"
-                android:textSize="16sp"
+                android:text="ALL 1,500.00"
+                android:textColor="#1976D2"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginStart="8dp" />
 
         </LinearLayout>
 
-        <!-- Row 2: Invoice Date, Bullet, Invoice Number and Due Amount -->
+        <!-- Row 3: Invoice Date, Invoice Number, Due Amount -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="4dp">
+            android:layout_marginBottom="4dp">
 
             <!-- Invoice Date -->
             <TextView
@@ -77,7 +115,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="INV-000001"
+                android:text="INV-0001"
                 android:textColor="#757575"
                 android:textSize="14sp"
                 android:ellipsize="end"
@@ -88,24 +126,24 @@
                 android:id="@+id/textViewDueAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Due: ALL1,500.00"
+                android:text="Due: ALL 1,500.00"
                 android:textColor="#757575"
                 android:textSize="14sp"
                 android:layout_marginStart="8dp" />
 
         </LinearLayout>
 
-        <!-- Row 3: Quantity/Items Count -->
+        <!-- Row 4: Quantity -->
         <TextView
             android:id="@+id/textViewQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1"
+            android:text="Qty: 10"
             android:textColor="#757575"
             android:textSize="14sp"
-            android:layout_marginTop="4dp" />
+            android:layout_marginBottom="8dp" />
 
-        <!-- Row 4: Overdue Status (Conditional - Only shows if overdue) -->
+        <!-- Row 5: Overdue Status (Conditional - Only shows if overdue) -->
         <TextView
             android:id="@+id/textViewOverdueStatus"
             android:layout_width="wrap_content"
@@ -114,7 +152,22 @@
             android:textColor="#D32F2F"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+        <!-- Row 6: Mark as Paid Button (Only shows for unpaid invoices) -->
+        <Button
+            android:id="@+id/buttonMarkPaid"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="✓ Mark as Paid"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            app:icon="@android:drawable/ic_menu_save"
+            app:iconGravity="start"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"
             android:visibility="gone" />
 
     </LinearLayout>

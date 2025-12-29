@@ -1,146 +1,270 @@
-package com.example.billingmanagementsystem; // ⚠️ change to your package
+package com.example.billingmanagementsystem;
 
-import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
+import java.util.List;
 
-public class ExpensesFragment extends Fragment {
+public class ExpensesFragment extends Fragment implements ExpenseAdapter.OnExpenseClickListener {
 
-    private TextInputEditText etTitle, etAmount, etDate, etNotes;
-    private Spinner spCategory;
-    private Button btnSave, btnShowTable;
-    private RecyclerView rvExpenses;
+    private TabLayout tabLayout;
+    private RecyclerView recyclerView;
+    private FloatingActionButton fabAddExpense;
+    private LinearLayout layoutEmptyState;
 
-    private ArrayList<Expense> expenseList = new ArrayList<>();
     private ExpenseAdapter adapter;
+    private List<Expense> allExpenses;
+    private String currentFilter = "All"; // Default tab
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_expenses, container, false);
+    }
 
-        View view = inflater.inflate(R.layout.fragment_expenses, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        // Bind views
-        etTitle = view.findViewById(R.id.etTitle);
-        etAmount = view.findViewById(R.id.etAmount);
-        etDate = view.findViewById(R.id.etDate);
-        etNotes = view.findViewById(R.id.etNotes);
-        spCategory = view.findViewById(R.id.spCategory);
-        btnSave = view.findViewById(R.id.btnSave);
-        btnShowTable = view.findViewById(R.id.btnShowTable);
-        rvExpenses = view.findViewById(R.id.rvExpenses);
+        // Initialize views
+        tabLayout = view.findViewById(R.id.tabLayout);
+        recyclerView = view.findViewById(R.id.rv_expenses);
+        fabAddExpense = view.findViewById(R.id.fab_add_expense);
+        layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
 
-        setupCategorySpinner();
-        setupDatePicker();
+        // Setup RecyclerView
         setupRecyclerView();
-        setupSaveButton();
-        setupShowTableButton();
 
-        return view;
-    }
+        // Load expenses
+        loadExpenses();
 
-    private void setupCategorySpinner() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                requireContext(),
-                R.array.expense_categories,
-                android.R.layout.simple_spinner_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spCategory.setAdapter(adapter);
-    }
+        // Setup tabs
+        setupTabs();
 
-    private void setupDatePicker() {
-        etDate.setOnClickListener(v -> {
-            Calendar calendar = Calendar.getInstance();
-
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog dialog = new DatePickerDialog(
-                    requireContext(),
-                    (view, y, m, d) -> etDate.setText(d + "/" + (m + 1) + "/" + y),
-                    year, month, day
-            );
-            dialog.show();
-        });
+        // Setup FAB
+        setupFAB();
     }
 
     private void setupRecyclerView() {
-        adapter = new ExpenseAdapter(expenseList);
-        rvExpenses.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvExpenses.setAdapter(adapter);
-        rvExpenses.setVisibility(View.GONE); // hidden initially
+        adapter = new ExpenseAdapter(this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerView.setAdapter(adapter);
     }
 
-    private void setupSaveButton() {
-        btnSave.setOnClickListener(v -> saveExpense());
+    private void loadExpenses() {
+        // Combine expenses from:
+        // 1. Purchase Invoices (Paid and Unpaid)
+        // 2. Manual Expense Entries
+
+        allExpenses = new ArrayList<>();
+
+        // Get expenses from purchase invoices
+        allExpenses.addAll(getExpensesFromPurchaseInvoices());
+
+        // Get manual expenses
+        allExpenses.addAll(getManualExpenses());
+
+        // Filter and display
+        filterExpenses(currentFilter);
     }
 
-    private void setupShowTableButton() {
-        btnShowTable.setOnClickListener(v -> {
-            if (rvExpenses.getVisibility() == View.GONE) {
-                rvExpenses.setVisibility(View.VISIBLE);
-                Toast.makeText(getContext(), "Expenses Table shown", Toast.LENGTH_SHORT).show();
-            } else {
-                rvExpenses.setVisibility(View.GONE);
+    private void setupTabs() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0: currentFilter = "All"; break;
+                    case 1: currentFilter = "Invoiced"; break;
+                    case 2: currentFilter = "Manual"; break;
+                    case 3: currentFilter = "Unpaid"; break;
+                }
+                filterExpenses(currentFilter);
             }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
-    private void saveExpense() {
-        String title = etTitle.getText().toString().trim();
-        String amount = etAmount.getText().toString().trim();
-        String date = etDate.getText().toString().trim();
-        String notes = etNotes.getText().toString().trim();
-        String category = spCategory.getSelectedItem().toString();
+    private void filterExpenses(String filter) {
+        List<Expense> filteredList = new ArrayList<>();
 
-        if (title.isEmpty() || amount.isEmpty() || date.isEmpty() || category.equals("Select Category")) {
-            Toast.makeText(getContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show();
-            return;
+        for (Expense expense : allExpenses) {
+            boolean matches = false;
+
+            switch (filter) {
+                case "All":
+                    // Show everything
+                    matches = true;
+                    break;
+
+                case "Invoiced":
+                    // Show only PAID purchase invoices
+                    matches = expense.isInvoiced();
+                    break;
+
+                case "Manual":
+                    // Show only manual expenses
+                    matches = expense.isManual();
+                    break;
+
+                case "Unpaid":
+                    // Show only UNPAID purchase invoices
+                    matches = expense.isUnpaid();
+                    break;
+            }
+
+            if (matches) {
+                filteredList.add(expense);
+            }
         }
 
-        // Get current timestamp
-        String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                .format(Calendar.getInstance().getTime());
+        adapter.setExpenses(filteredList);
 
-        // Add to list
-        Expense expense = new Expense(title, amount, category, date, notes, timestamp);
-        DataHolder.getInstance().addExpense(expense);
+        if (filteredList.isEmpty()) {
+            layoutEmptyState.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            layoutEmptyState.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 
-        adapter.notifyDataSetChanged();
+    private void setupFAB() {
+        fabAddExpense.setOnClickListener(v -> {
+            NavHostFragment.findNavController(ExpensesFragment.this)
+                    .navigate(R.id.action_expensesFragment_to_addExpenseFragment);
+        });
+    }
 
-        // Show Toast
-        Toast.makeText(getContext(), "Expense saved successfully", Toast.LENGTH_SHORT).show();
+    // ==================== Listener Implementation ====================
 
-        // Clear fields
-        etTitle.setText("");
-        etAmount.setText("");
-        etDate.setText("");
-        etNotes.setText("");
-        spCategory.setSelection(0);
+    @Override
+    public void onExpenseClick(Expense expense) {
+        Toast.makeText(requireContext(),
+                "Expense: " + expense.getTitle(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMarkAsPaidClick(Expense expense) {
+        // Mark unpaid purchase invoice as paid
+        expense.markAsPaid();
+
+        // TODO: Update in database
+
+        // Refresh display
+        filterExpenses(currentFilter);
+
+        Snackbar.make(requireView(),
+                "Expense marked as paid!",
+                Snackbar.LENGTH_SHORT).show();
+    }
+
+    // ==================== Data Loading ====================
+
+    /**
+     * Get expenses from Purchase invoices (both paid and unpaid)
+     */
+    private List<Expense> getExpensesFromPurchaseInvoices() {
+        List<Expense> invoicedExpenses = new ArrayList<>();
+
+        // TODO: Database query
+        // SELECT * FROM invoices WHERE type='Purchase'
+
+        // Sample data
+        Calendar cal = Calendar.getInstance();
+
+        // Paid purchase invoice
+        cal.set(2024, Calendar.DECEMBER, 10);
+        invoicedExpenses.add(new Expense(
+                "1",
+                "INV-0002",
+                "XYZ Suppliers",
+                2500.00,
+                cal.getTimeInMillis(),
+                "Office Supplies",
+                true  // isPaid
+        ));
+
+        // Unpaid purchase invoice
+        cal.set(2024, Calendar.DECEMBER, 25);
+        invoicedExpenses.add(new Expense(
+                "2",
+                "INV-0004",
+                "Office Depot",
+                5000.00,
+                cal.getTimeInMillis(),
+                "Equipment",
+                false  // isPaid = false (Unpaid)
+        ));
+
+        return invoicedExpenses;
+    }
+
+    /**
+     * Get manual expenses
+     */
+    private List<Expense> getManualExpenses() {
+        List<Expense> manualExpenses = new ArrayList<>();
+
+        // TODO: Database query
+        // SELECT * FROM manual_expenses
+
+        // Sample data from DataHolder
+        if (DataHolder.getInstance() != null &&
+                DataHolder.getInstance().getExpenseList() != null) {
+
+            for (Expense oldExpense : DataHolder.getInstance().getExpenseList()) {
+                manualExpenses.add(oldExpense);
+            }
+        }
+
+        // Sample manual expense
+        Calendar cal = Calendar.getInstance();
+        cal.set(2024, Calendar.DECEMBER, 15);
+
+        manualExpenses.add(new Expense(
+                "3",
+                "Lunch Meeting",
+                50.00,
+                cal.getTimeInMillis(),
+                "Meals",
+                "Team lunch at restaurant"
+        ));
+
+        return manualExpenses;
+    }
+
+    public void refreshExpenses() {
+        loadExpenses();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshExpenses();
     }
 }
-
-

@@ -1,182 +1,267 @@
 package com.example.billingmanagementsystem;
 
-import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
+import java.util.List;
 
-public class IncomesFragment extends Fragment {
+/**
+ * Fragment to display and manage incomes
+ * Shows incomes from paid Sales invoices and manual entries
+ * 3 tabs: All, Invoiced, Manual
+ */
+public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeClickListener {
 
-    private Button btnCustomer, btnOthers, btnSaveIncome, btnShowIncomeTable;
-    private LinearLayout customerFields, othersFields;
-    private RecyclerView rvIncomes;
-    private TextInputEditText etCustomerName, etCustomerPhone, etCustomerEmail, etProduct,
-            etCustomerAmount, etCustomerDate, etCustomerNotes;
-    private TextInputEditText etOtherSource, etOtherAmount, etOtherDate, etOtherNotes;
+    private TabLayout tabLayout;
+    private RecyclerView recyclerView;
+    private FloatingActionButton fabAddIncome;
+    private LinearLayout layoutEmptyState;
 
-    private ArrayList<Income> incomeList = new ArrayList<>();
     private IncomeAdapter adapter;
+    private List<Income> allIncomes;
+    private String currentFilter = "All"; // Default tab
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_incomes, container, false);
+        return inflater.inflate(R.layout.fragment_incomes, container, false);
+    }
 
-        // Bind Views
-        btnCustomer = view.findViewById(R.id.btnCustomer);
-        btnOthers = view.findViewById(R.id.btnOthers);
-        btnSaveIncome = view.findViewById(R.id.btnSaveIncome);
-        btnShowIncomeTable = view.findViewById(R.id.btnShowIncomeTable);
-        customerFields = view.findViewById(R.id.customerFields);
-        othersFields = view.findViewById(R.id.othersFields);
-        rvIncomes = view.findViewById(R.id.rvIncomes);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        etCustomerName = view.findViewById(R.id.etCustomerName);
-        etCustomerPhone = view.findViewById(R.id.etCustomerPhone);
-        etCustomerEmail = view.findViewById(R.id.etCustomerEmail);
-        etProduct = view.findViewById(R.id.etProduct);
-        etCustomerAmount = view.findViewById(R.id.etCustomerAmount);
-        etCustomerDate = view.findViewById(R.id.etCustomerDate);
-        etCustomerNotes = view.findViewById(R.id.etCustomerNotes);
+        // Initialize views
+        tabLayout = view.findViewById(R.id.tabLayout);
+        recyclerView = view.findViewById(R.id.rv_incomes);
+        fabAddIncome = view.findViewById(R.id.fab_add_income);
+        layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
 
-        etOtherSource = view.findViewById(R.id.etOtherSource);
-        etOtherAmount = view.findViewById(R.id.etOtherAmount);
-        etOtherDate = view.findViewById(R.id.etOtherDate);
-        etOtherNotes = view.findViewById(R.id.etOtherNotes);
-
-        setupToggleButtons();
-        setupDatePickers();
+        // Setup RecyclerView
         setupRecyclerView();
-        setupSaveIncomeButton();
-        setupShowIncomeTableButton();
 
-        return view;
-    }
+        // Load incomes
+        loadIncomes();
 
-    private void setupToggleButtons() {
-        btnCustomer.setOnClickListener(v -> {
-            customerFields.setVisibility(View.VISIBLE);
-            othersFields.setVisibility(View.GONE);
-        });
+        // Setup tabs
+        setupTabs();
 
-        btnOthers.setOnClickListener(v -> {
-            customerFields.setVisibility(View.GONE);
-            othersFields.setVisibility(View.VISIBLE);
-        });
-    }
-
-    private void setupDatePickers() {
-        etCustomerDate.setOnClickListener(v -> showDatePicker(etCustomerDate));
-        etOtherDate.setOnClickListener(v -> showDatePicker(etOtherDate));
-    }
-
-    private void showDatePicker(TextInputEditText editText) {
-        Calendar calendar = Calendar.getInstance();
-        DatePickerDialog dialog = new DatePickerDialog(requireContext(),
-                (view, year, month, dayOfMonth) -> editText.setText(dayOfMonth + "/" + (month + 1) + "/" + year),
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
-        dialog.show();
+        // Setup FAB
+        setupFAB();
     }
 
     private void setupRecyclerView() {
-        adapter = new IncomeAdapter(incomeList);
-        rvIncomes.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvIncomes.setAdapter(adapter);
-        rvIncomes.setVisibility(View.GONE);
+        adapter = new IncomeAdapter(this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerView.setAdapter(adapter);
     }
 
-    private void setupSaveIncomeButton() {
-        btnSaveIncome.setOnClickListener(v -> saveIncome());
+    private void loadIncomes() {
+        // Combine incomes from:
+        // 1. Paid Sales Invoices (automatic)
+        // 2. Manual Income Entries (user-added)
+
+        allIncomes = new ArrayList<>();
+
+        // TODO: Get paid sales invoices from database
+        // SELECT * FROM invoices WHERE type='Sales' AND status='Paid'
+        allIncomes.addAll(getIncomesFromPaidInvoices());
+
+        // TODO: Get manual income entries from database
+        // SELECT * FROM manual_incomes
+        allIncomes.addAll(getManualIncomes());
+
+        // Filter and display
+        filterIncomes(currentFilter);
     }
 
-    private void setupShowIncomeTableButton() {
-        btnShowIncomeTable.setOnClickListener(v -> {
-            if (rvIncomes.getVisibility() == View.GONE) {
-                rvIncomes.setVisibility(View.VISIBLE);
-                Toast.makeText(getContext(), "Income Table shown", Toast.LENGTH_SHORT).show();
-            } else {
-                rvIncomes.setVisibility(View.GONE);
+    private void setupTabs() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0: currentFilter = "All"; break;
+                    case 1: currentFilter = "Invoiced"; break;
+                    case 2: currentFilter = "Manual"; break;
+                }
+                filterIncomes(currentFilter);
             }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
-    private void saveIncome() {
-        String type, nameOrSource = "", phone = "", email = "", product = "", amount, date, notes;
+    private void filterIncomes(String filter) {
+        List<Income> filteredList = new ArrayList<>();
 
-        if (customerFields.getVisibility() == View.VISIBLE) {
-            type = "Customer";
-            nameOrSource = etCustomerName.getText().toString().trim();
-            phone = etCustomerPhone.getText().toString().trim();
-            email = etCustomerEmail.getText().toString().trim();
-            product = etProduct.getText().toString().trim();
-            amount = etCustomerAmount.getText().toString().trim();
-            date = etCustomerDate.getText().toString().trim();
-            notes = etCustomerNotes.getText().toString().trim();
+        for (Income income : allIncomes) {
+            boolean matches = false;
 
-            if (nameOrSource.isEmpty() || amount.isEmpty() || date.isEmpty()) {
-                Toast.makeText(getContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show();
-                return;
+            switch (filter) {
+                case "All":
+                    // Show everything
+                    matches = true;
+                    break;
+
+                case "Invoiced":
+                    // Show only incomes from paid invoices
+                    matches = income.isInvoiced();
+                    break;
+
+                case "Manual":
+                    // Show only manual income entries
+                    matches = income.isManual();
+                    break;
             }
-        } else {
-            type = "Other";
-            nameOrSource = etOtherSource.getText().toString().trim();
-            amount = etOtherAmount.getText().toString().trim();
-            date = etOtherDate.getText().toString().trim();
-            notes = etOtherNotes.getText().toString().trim();
 
-            if (nameOrSource.isEmpty() || amount.isEmpty() || date.isEmpty()) {
-                Toast.makeText(getContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show();
-                return;
+            if (matches) {
+                filteredList.add(income);
             }
         }
 
-        // Timestamp
-        String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                .format(Calendar.getInstance().getTime());
+        // Update adapter
+        adapter.setIncomes(filteredList);
 
-        Income income = new Income(type, nameOrSource, phone, email, product, amount, date, notes, timestamp);
-        DataHolder.getInstance().addIncome(income);
-
-        adapter.notifyDataSetChanged();
-
-        Toast.makeText(getContext(), "Income saved successfully", Toast.LENGTH_SHORT).show();
-        clearFields();
+        // Show/hide empty state
+        if (filteredList.isEmpty()) {
+            layoutEmptyState.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            layoutEmptyState.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
-    private void clearFields() {
-        etCustomerName.setText("");
-        etCustomerPhone.setText("");
-        etCustomerEmail.setText("");
-        etProduct.setText("");
-        etCustomerAmount.setText("");
-        etCustomerDate.setText("");
-        etCustomerNotes.setText("");
+    private void setupFAB() {
+        fabAddIncome.setOnClickListener(v -> {
+            // Navigate to Add Manual Income screen
+            // TODO: Create AddManualIncomeFragment
+            NavHostFragment.findNavController(IncomesFragment.this)
+                    .navigate(R.id.addManualIncomeFragment);
+        });
+    }
 
-        etOtherSource.setText("");
-        etOtherAmount.setText("");
-        etOtherDate.setText("");
-        etOtherNotes.setText("");
+    // ==================== OnIncomeClickListener Implementation ====================
+
+    @Override
+    public void onIncomeClick(Income income) {
+        // TODO: Show income details or navigate to related invoice
+        Toast.makeText(requireContext(),
+                "Income: " + income.getSource(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    // ==================== Data Loading Methods ====================
+
+    /**
+     * Get incomes from PAID Sales invoices
+     * This runs automatically when an invoice is marked as paid
+     */
+    private List<Income> getIncomesFromPaidInvoices() {
+        List<Income> invoicedIncomes = new ArrayList<>();
+
+        // TODO: Replace with database query
+        // SELECT i.id, i.invoice_number, p.name, i.total, i.issue_date, i.product
+        // FROM invoices i
+        // JOIN partners p ON i.partner_id = p.id
+        // WHERE i.type = 'Sales' AND i.status = 'Paid'
+
+        // Sample data (remove when connecting to database)
+        Calendar cal = Calendar.getInstance();
+        cal.set(2024, Calendar.DECEMBER, 15);
+
+        invoicedIncomes.add(new Income(
+                "1",
+                "INV-0001",
+                "ABC Company",
+                1500.00,
+                cal.getTimeInMillis(),
+                "Web Development Services"
+        ));
+
+        cal.set(2024, Calendar.DECEMBER, 20);
+        invoicedIncomes.add(new Income(
+                "2",
+                "INV-0003",
+                "Tech Corp",
+                3200.50,
+                cal.getTimeInMillis(),
+                "Consulting Services"
+        ));
+
+        return invoicedIncomes;
+    }
+
+    /**
+     * Get manual income entries (user-added)
+     */
+    private List<Income> getManualIncomes() {
+        List<Income> manualIncomes = new ArrayList<>();
+
+        // TODO: Replace with database query
+        // SELECT * FROM manual_incomes
+
+        // Sample data from DataHolder (if exists)
+        if (DataHolder.getInstance() != null &&
+                DataHolder.getInstance().getIncomeList() != null) {
+
+            // Convert old Income objects to new format
+            for (Income oldIncome : DataHolder.getInstance().getIncomeList()) {
+                manualIncomes.add(oldIncome);
+            }
+        }
+
+        // Sample manual income
+        Calendar cal = Calendar.getInstance();
+        cal.set(2024, Calendar.DECEMBER, 25);
+
+        manualIncomes.add(new Income(
+                "3",
+                "Direct Payment - John Doe",
+                500.00,
+                cal.getTimeInMillis(),
+                "Freelance Work",
+                "+1234567890",
+                "john@example.com",
+                "Quick cash payment"
+        ));
+
+        return manualIncomes;
+    }
+
+    /**
+     * Refresh incomes (call this when a new invoice is paid)
+     */
+    public void refreshIncomes() {
+        loadIncomes();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh when returning to screen
+        refreshIncomes();
     }
 }
-

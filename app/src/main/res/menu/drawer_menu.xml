@@ -1,7 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/homeFragment" android:title="Home Dashboard" />
-    <item android:id="@+id/invoiceFragment" android:title="Invoice Management" />
-    <item android:id="@+id/salesReceiptFragment" android:title="Sales Receipts" />
-    <item android:id="@+id/paymentsReceivedFragment" android:title="Payments" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/homeFragment"
+            android:icon="@drawable/ic_home"
+            android:title="Home" />
+
+        <item
+            android:id="@+id/invoiceFragment"
+            android:icon="@drawable/ic_invoice"
+            android:title="Invoices" />
+
+        <item
+            android:id="@+id/salesReceiptFragment"
+            android:icon="@drawable/ic_sales"
+            android:title="Sales Receipts" />
+
+        <item
+            android:id="@+id/paymentsReceivedFragment"
+            android:icon="@drawable/ic_payment"
+            android:title="Payments Received" />
+
+    </group>
+
+    <item android:title="Financial Reports">
+        <menu>
+            <group android:checkableBehavior="single">
+
+                <item
+                    android:id="@+id/incomesFragment"
+                    android:icon="@drawable/ic_income"
+                    android:title="Incomes" />
+
+                <item
+                    android:id="@+id/expensesFragment"
+                    android:icon="@drawable/ic_expense"
+                    android:title="Expenses" />
+
+                <item
+                    android:id="@+id/profitFragment"
+                    android:icon="@drawable/ic_profits"
+                    android:title="Profit" />
+
+            </group>
+        </menu>
+    </item>
+
+    <item android:title="Account">
+        <menu>
+            <group android:checkableBehavior="single">
+
+                <item
+                    android:id="@+id/settingsFragment"
+                    android:icon="@drawable/ic_settings"
+                    android:title="Settings" />
+
+            </group>
+        </menu>
+    </item>
+
 </menu>

@@ -7,4 +7,38 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+        <!-- Primary Colors -->
+        <color name="primary">#1976D2</color>              <!-- Blue -->
+        <color name="primary_dark">#1565C0</color>         <!-- Darker Blue -->
+        <color name="primary_light">#BBDEFB</color>        <!-- Light Blue -->
+
+        <!-- Accent -->
+        <color name="accent">#FF9800</color>               <!-- Orange -->
+
+        <!-- Status Colors -->
+        <color name="status_paid">#4CAF50</color>          <!-- Green -->
+        <color name="status_unpaid">#F44336</color>        <!-- Red -->
+        <color name="status_partial">#FF9800</color>       <!-- Orange -->
+        <color name="status_overdue">#D32F2F</color>       <!-- Dark Red -->
+
+        <!-- Invoice Type Colors -->
+        <color name="type_sales">#2196F3</color>           <!-- Blue -->
+        <color name="type_purchase">#9C27B0</color>        <!-- Purple -->
+
+        <!-- Background -->
+        <color name="background">#F5F5F5</color>           <!-- Light Gray -->
+        <color name="card_background">#FFFFFF</color>      <!-- White -->
+
+        <!-- Text -->
+        <color name="text_primary">#212121</color>         <!-- Almost Black -->
+        <color name="text_secondary">#757575</color>       <!-- Gray -->
+        <color name="text_hint">#BDBDBD</color>            <!-- Light Gray -->
+
+        <!-- Other -->
+        <color name="divider">#E0E0E0</color>
+    <!-- Income-specific colors -->
+    <color name="income_invoiced">#4CAF50</color>   <!-- Green -->
+    <color name="income_manual">#2196F3</color>     <!-- Blue -->
+    <color name="income_amount">#4CAF50</color>     <!-- Green (money in) -->
 </resources>

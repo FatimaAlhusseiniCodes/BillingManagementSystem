@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/homeFragment"
-        android:title="Home"
-        android:icon="@android:drawable/ic_menu_today" />
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+
     <item
         android:id="@+id/invoiceFragment"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/ic_invoice"
         android:title="Invoices" />
+
     <item
         android:id="@+id/salesReceiptFragment"
-        android:icon="@android:drawable/ic_menu_day"
+        android:icon="@drawable/ic_sales"
         android:title="Sales" />
+
     <item
-        android:id="@+id/paymentsReceivedFragment"
-        android:icon="@android:drawable/ic_menu_save"
-        android:title="Payments" />
+        android:id="@+id/profitFragment"
+        android:icon="@drawable/ic_profits"
+        android:title="Reports" />
+
 </menu>
