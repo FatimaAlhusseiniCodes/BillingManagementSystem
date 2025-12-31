@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Search Icon - Always visible on action bar -->
+    <item
+        android:id="@+id/action_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="Search Partners"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <!-- Sort Icon - Always visible on action bar -->
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Sort By"
+        app:showAsAction="ifRoom">
+
+        <!-- Submenu for sort options -->
+        <menu>
+            <item
+                android:id="@+id/sort_by_name"
+                android:title="Sort by Name (A-Z)"
+                android:icon="@android:drawable/ic_menu_sort_alphabetically" />
+
+            <item
+                android:id="@+id/sort_by_date"
+                android:title="Sort by Date Created (Newest)"
+                android:icon="@android:drawable/ic_menu_recent_history" />
+
+            <item
+                android:id="@+id/sort_by_invoices"
+                android:title="Sort by Invoice Count"
+                android:icon="@android:drawable/ic_menu_agenda" />
+
+            <item
+                android:id="@+id/sort_by_amount"
+                android:title="Sort by Total Amount"
+                android:icon="@android:drawable/ic_menu_view" />
+        </menu>
+    </item>
+
+    <!-- Filter Icon (Optional) -->
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="Filter"
+        app:showAsAction="never" />
+
+    <!-- Refresh -->
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:title="Refresh"
+        app:showAsAction="never" />
+
+</menu>

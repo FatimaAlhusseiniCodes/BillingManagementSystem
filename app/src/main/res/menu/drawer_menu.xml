@@ -4,7 +4,6 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-
         <item
             android:id="@+id/homeFragment"
             android:icon="@drawable/ic_home"
@@ -16,6 +15,11 @@
             android:title="Invoices" />
 
         <item
+            android:id="@+id/partnersFragment"
+            android:icon="@drawable/ic_partner"
+            android:title="Partners" />
+
+        <item
             android:id="@+id/salesReceiptFragment"
             android:icon="@drawable/ic_sales"
             android:title="Sales Receipts" />
@@ -24,13 +28,11 @@
             android:id="@+id/paymentsReceivedFragment"
             android:icon="@drawable/ic_payment"
             android:title="Payments Received" />
-
     </group>
 
     <item android:title="Financial Reports">
         <menu>
             <group android:checkableBehavior="single">
-
                 <item
                     android:id="@+id/incomesFragment"
                     android:icon="@drawable/ic_income"
@@ -40,12 +42,6 @@
                     android:id="@+id/expensesFragment"
                     android:icon="@drawable/ic_expense"
                     android:title="Expenses" />
-
-                <item
-                    android:id="@+id/profitFragment"
-                    android:icon="@drawable/ic_profits"
-                    android:title="Profit" />
-
             </group>
         </menu>
     </item>
@@ -53,12 +49,10 @@
     <item android:title="Account">
         <menu>
             <group android:checkableBehavior="single">
-
                 <item
                     android:id="@+id/settingsFragment"
                     android:icon="@drawable/ic_settings"
                     android:title="Settings" />
-
             </group>
         </menu>
     </item>

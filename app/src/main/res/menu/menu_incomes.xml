@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Search Icon -->
+    <item
+        android:id="@+id/action_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="Search Incomes"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <!-- Sort Menu -->
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Sort By"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item
+                android:id="@+id/sort_by_date"
+                android:title="Sort by Date (Newest First)"
+                android:icon="@android:drawable/ic_menu_recent_history" />
+
+            <item
+                android:id="@+id/sort_by_amount"
+                android:title="Sort by Amount (Highest First)"
+                android:icon="@android:drawable/ic_menu_view" />
+        </menu>
+    </item>
+
+    <!-- Refresh -->
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:title="Refresh"
+        app:showAsAction="never" />
+
+    <!-- Export (Optional) -->
+    <item
+        android:id="@+id/action_export"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:title="Export to Excel"
+        app:showAsAction="never" />
+
+</menu>

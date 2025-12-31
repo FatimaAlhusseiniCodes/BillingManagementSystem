@@ -12,6 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,22 +28,13 @@ import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
-    // Header views
     private TextView tvBusinessName;
     private TextView tvWelcome;
-
-    // Containers
     private LinearLayout layoutUpcomingPayments;
     private LinearLayout layoutProfitMonths;
     private TextView tvNoUpcomingPayments;
     private TextView tvNoProfitData;
-
-    // Format for currency
     private DecimalFormat currencyFormat = new DecimalFormat("#,##0.00");
-
-    public HomeFragment() {
-        // Required empty constructor
-    }
 
     @Nullable
     @Override
@@ -53,7 +48,6 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize views
         tvBusinessName = view.findViewById(R.id.tvBusinessName);
         tvWelcome = view.findViewById(R.id.tvWelcome);
         layoutUpcomingPayments = view.findViewById(R.id.layoutUpcomingPayments);
@@ -61,82 +55,107 @@ public class HomeFragment extends Fragment {
         tvNoUpcomingPayments = view.findViewById(R.id.tvNoUpcomingPayments);
         tvNoProfitData = view.findViewById(R.id.tvNoProfitData);
 
-        // Load user data (TODO: Replace with actual data from database/preferences)
         loadUserData();
-
-        // Setup quick action buttons
         setupQuickActions(view);
-
-        // Load upcoming payments
         loadUpcomingPayments();
-
-        // Load profit data
         loadProfitData();
     }
 
-    /**
-     * Load user and business information
-     * TODO: Replace with actual data from SharedPreferences or Database
-     */
     private void loadUserData() {
-        // TODO: Get from SharedPreferences or User table
-        String businessName = "My Business"; // Replace with actual business name
-        String userName = "Fatima Alhusseini"; // Replace with actual user name
+        SessionManager session = new SessionManager(getContext());
+        String businessName = session.getBusinessName();
+        String email = session.getEmail();
 
-        tvBusinessName.setText(businessName);
-        tvWelcome.setText("Welcome, " + userName);
+        if (businessName != null && !businessName.isEmpty()) {
+            tvBusinessName.setText(businessName);
+        } else {
+            tvBusinessName.setText("My Business");
+        }
+
+        if (email != null && !email.isEmpty()) {
+            String userName = email.split("@")[0];
+            tvWelcome.setText("Welcome, " + userName);
+        } else {
+            tvWelcome.setText("Welcome");
+        }
     }
 
-    /**
-     * Setup quick action buttons navigation
-     */
     private void setupQuickActions(View view) {
-        // New Invoice
         view.findViewById(R.id.btnNewInvoice).setOnClickListener(v -> {
-            NavHostFragment.findNavController(HomeFragment.this)
-                    .navigate(R.id.addInvoiceFragment);
+            try {
+                NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.addInvoiceFragment);
+            } catch (Exception e) { }
         });
 
-        // New Partner
         view.findViewById(R.id.btnNewPartner).setOnClickListener(v -> {
-            NavHostFragment.findNavController(HomeFragment.this)
-                    .navigate(R.id.addPartnerFragment);
+            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.addPartnerFragment);
         });
 
-        // New Expense
         view.findViewById(R.id.btnNewExpense).setOnClickListener(v -> {
-            NavHostFragment.findNavController(HomeFragment.this)
-                    .navigate(R.id.expensesFragment);
+            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.expensesFragment);
         });
 
-        // New Income
         view.findViewById(R.id.btnNewIncome).setOnClickListener(v -> {
-            NavHostFragment.findNavController(HomeFragment.this)
-                    .navigate(R.id.incomesFragment);
+            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.incomesFragment);
         });
     }
 
-    /**
-     * Load upcoming payments from Purchase Invoices
-     * Shows nearest 5 payments, sorted by due date (nearest first)
-     */
     private void loadUpcomingPayments() {
-        // TODO: Replace with actual database query
-        // Query: SELECT * FROM invoices WHERE invoice_type='Purchase'
-        //        AND status IN ('Unpaid', 'Partially Paid')
-        //        ORDER BY due_date ASC LIMIT 5
+        SessionManager session = new SessionManager(getContext());
+        int userId = session.getUserId();
 
-        List<UpcomingPayment> payments = getSampleUpcomingPayments();
-
-        // Sort by due date (nearest first)
-        Collections.sort(payments, new Comparator<UpcomingPayment>() {
+        ApiClient.getInvoices(getContext(), userId, "Purchase", "Unpaid", new ApiClient.ApiCallback() {
             @Override
-            public int compare(UpcomingPayment p1, UpcomingPayment p2) {
-                return p1.dueDate.compareTo(p2.dueDate);
+            public void onSuccess(JSONObject response) {
+                if (!isAdded()) return;
+
+                try {
+                    if (response.getBoolean("success")) {
+                        JSONArray data = response.getJSONArray("data");
+                        List<UpcomingPayment> payments = new ArrayList<>();
+
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject item = data.getJSONObject(i);
+
+                            String supplierName = item.optString("partner_name", "Unknown");
+                            String invoiceNumber = item.optString("invoice_number", "");
+                            double amount = item.optDouble("total_amount", 0.0);
+                            String dueDateStr = item.optString("due_date", "");
+
+                            Date dueDate = new Date();
+                            if (!dueDateStr.isEmpty()) {
+                                try {
+                                    SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                    dueDate = apiFormat.parse(dueDateStr);
+                                } catch (Exception ignored) { }
+                            }
+
+                            payments.add(new UpcomingPayment(supplierName, invoiceNumber, amount, dueDate));
+                        }
+
+                        Collections.sort(payments, new Comparator<UpcomingPayment>() {
+                            @Override
+                            public int compare(UpcomingPayment p1, UpcomingPayment p2) {
+                                return p1.dueDate.compareTo(p2.dueDate);
+                            }
+                        });
+
+                        displayUpcomingPayments(payments);
+                    }
+                } catch (JSONException e) {
+                    displayUpcomingPayments(new ArrayList<>());
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                if (!isAdded()) return;
+                displayUpcomingPayments(new ArrayList<>());
             }
         });
+    }
 
-        // Clear existing views
+    private void displayUpcomingPayments(List<UpcomingPayment> payments) {
         layoutUpcomingPayments.removeAllViews();
 
         if (payments.isEmpty()) {
@@ -146,24 +165,18 @@ public class HomeFragment extends Fragment {
 
         tvNoUpcomingPayments.setVisibility(View.GONE);
 
-        // Take only first 5
         int count = Math.min(payments.size(), 5);
         for (int i = 0; i < count; i++) {
             UpcomingPayment payment = payments.get(i);
             View paymentView = createPaymentItemView(payment);
             layoutUpcomingPayments.addView(paymentView);
 
-            // Add divider except for last item
             if (i < count - 1) {
-                View divider = createDivider();
-                layoutUpcomingPayments.addView(divider);
+                layoutUpcomingPayments.addView(createDivider());
             }
         }
     }
 
-    /**
-     * Create a view for a single payment item
-     */
     private View createPaymentItemView(UpcomingPayment payment) {
         View view = LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_upcoming_payment, layoutUpcomingPayments, false);
@@ -180,37 +193,79 @@ public class HomeFragment extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         tvDueDate.setText("Due: " + sdf.format(payment.dueDate));
 
-        // Check if overdue
         if (payment.dueDate.before(new Date())) {
-            tvDueDate.setTextColor(0xFFF44336); // Red color for overdue
+            tvDueDate.setTextColor(0xFFF44336);
             tvDueDate.setText("OVERDUE: " + sdf.format(payment.dueDate));
         }
 
         return view;
     }
 
-    /**
-     * Load profit data for last 5 months
-     * Shows profits from newest to oldest
-     */
     private void loadProfitData() {
-        // TODO: Replace with actual database query
-        // Query: SELECT month, year, SUM(income) as total_income, SUM(expenses) as total_expenses
-        //        FROM monthly_summary
-        //        GROUP BY year, month
-        //        ORDER BY year DESC, month DESC LIMIT 5
+        SessionManager session = new SessionManager(getContext());
+        int userId = session.getUserId();
 
-        List<MonthlyProfit> profits = getSampleMonthlyProfits();
+        final List<MonthlyProfit> profits = new ArrayList<>();
+        final int[] monthsCompleted = {0};
+        final int totalMonths = 5;
 
-        // Sort by date (newest first)
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        for (int i = 0; i < totalMonths; i++) {
+            cal.add(Calendar.MONTH, -1);
+
+            Calendar startCal = (Calendar) cal.clone();
+            startCal.set(Calendar.DAY_OF_MONTH, 1);
+            String startDate = apiFormat.format(startCal.getTime());
+
+            Calendar endCal = (Calendar) cal.clone();
+            endCal.set(Calendar.DAY_OF_MONTH, endCal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            String endDate = apiFormat.format(endCal.getTime());
+
+            final Date monthDate = startCal.getTime();
+
+            ApiClient.calculateProfit(getContext(), userId, startDate, endDate, new ApiClient.ApiCallback() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    if (!isAdded()) return;
+
+                    try {
+                        if (response.getBoolean("success")) {
+                            JSONObject data = response.getJSONObject("data");
+                            double income = data.optDouble("total_revenue", 0.0);
+                            double expenses = data.optDouble("total_expenses", 0.0);
+
+                            profits.add(new MonthlyProfit(monthDate, income, expenses));
+                        }
+                    } catch (JSONException ignored) { }
+
+                    monthsCompleted[0]++;
+                    if (monthsCompleted[0] == totalMonths) {
+                        displayProfitData(profits);
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                    if (!isAdded()) return;
+                    monthsCompleted[0]++;
+                    if (monthsCompleted[0] == totalMonths) {
+                        displayProfitData(profits);
+                    }
+                }
+            });
+        }
+    }
+
+    private void displayProfitData(List<MonthlyProfit> profits) {
         Collections.sort(profits, new Comparator<MonthlyProfit>() {
             @Override
             public int compare(MonthlyProfit p1, MonthlyProfit p2) {
-                return p2.date.compareTo(p1.date); // Descending order
+                return p2.date.compareTo(p1.date);
             }
         });
 
-        // Clear existing views
         layoutProfitMonths.removeAllViews();
 
         if (profits.isEmpty()) {
@@ -220,24 +275,18 @@ public class HomeFragment extends Fragment {
 
         tvNoProfitData.setVisibility(View.GONE);
 
-        // Take only first 5
         int count = Math.min(profits.size(), 5);
         for (int i = 0; i < count; i++) {
             MonthlyProfit profit = profits.get(i);
             View profitView = createProfitItemView(profit);
             layoutProfitMonths.addView(profitView);
 
-            // Add divider except for last item
             if (i < count - 1) {
-                View divider = createDivider();
-                layoutProfitMonths.addView(divider);
+                layoutProfitMonths.addView(createDivider());
             }
         }
     }
 
-    /**
-     * Create a view for a single profit month item
-     */
     private View createProfitItemView(MonthlyProfit profit) {
         View view = LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_monthly_profit, layoutProfitMonths, false);
@@ -254,13 +303,12 @@ public class HomeFragment extends Fragment {
         String sign = profitAmount >= 0 ? "+" : "";
         tvProfit.setText(sign + " ALL " + currencyFormat.format(profitAmount));
 
-        // Color code profit
         if (profitAmount > 0) {
-            tvProfit.setTextColor(0xFF4CAF50); // Green for profit
+            tvProfit.setTextColor(0xFF4CAF50);
         } else if (profitAmount < 0) {
-            tvProfit.setTextColor(0xFFF44336); // Red for loss
+            tvProfit.setTextColor(0xFFF44336);
         } else {
-            tvProfit.setTextColor(0xFF757575); // Gray for zero
+            tvProfit.setTextColor(0xFF757575);
         }
 
         tvIncome.setText("Income: ALL " + currencyFormat.format(profit.income));
@@ -269,109 +317,16 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Create a divider view
-     */
     private View createDivider() {
         View divider = new View(requireContext());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                1 // 1dp height
-        );
+                ViewGroup.LayoutParams.MATCH_PARENT, 1);
         params.setMargins(0, 12, 0, 12);
         divider.setLayoutParams(params);
-        divider.setBackgroundColor(0xFFE0E0E0); // Light gray
+        divider.setBackgroundColor(0xFFE0E0E0);
         return divider;
     }
 
-    // ==================== SAMPLE DATA (Remove when connecting to database) ====================
-
-    /**
-     * Sample upcoming payments data
-     * TODO: Replace with actual database query
-     */
-    private List<UpcomingPayment> getSampleUpcomingPayments() {
-        List<UpcomingPayment> payments = new ArrayList<>();
-
-        Calendar cal = Calendar.getInstance();
-
-        // Payment 1 - Overdue
-        cal.set(2024, Calendar.DECEMBER, 15);
-        payments.add(new UpcomingPayment(
-                "ABC Supplies",
-                "INV-001",
-                1500.00,
-                cal.getTime()
-        ));
-
-        // Payment 2 - Due soon
-        cal.set(2025, Calendar.JANUARY, 5);
-        payments.add(new UpcomingPayment(
-                "XYZ Trading",
-                "INV-002",
-                2300.50,
-                cal.getTime()
-        ));
-
-        // Payment 3
-        cal.set(2025, Calendar.JANUARY, 15);
-        payments.add(new UpcomingPayment(
-                "Global Partners",
-                "INV-003",
-                890.00,
-                cal.getTime()
-        ));
-
-        // Payment 4
-        cal.set(2025, Calendar.FEBRUARY, 1);
-        payments.add(new UpcomingPayment(
-                "Tech Solutions",
-                "INV-004",
-                4500.00,
-                cal.getTime()
-        ));
-
-        // Payment 5
-        cal.set(2025, Calendar.FEBRUARY, 10);
-        payments.add(new UpcomingPayment(
-                "Office Depot",
-                "INV-005",
-                670.25,
-                cal.getTime()
-        ));
-
-        return payments;
-    }
-
-    /**
-     * Sample monthly profit data
-     * TODO: Replace with actual database query
-     */
-    private List<MonthlyProfit> getSampleMonthlyProfits() {
-        List<MonthlyProfit> profits = new ArrayList<>();
-
-        Calendar cal = Calendar.getInstance();
-
-        // Last 5 months
-        for (int i = 0; i < 5; i++) {
-            cal.add(Calendar.MONTH, -1);
-            Date monthDate = cal.getTime();
-
-            // Sample data - varies per month
-            double income = 5000 + (i * 500);
-            double expenses = 3500 + (i * 300);
-
-            profits.add(new MonthlyProfit(monthDate, income, expenses));
-        }
-
-        return profits;
-    }
-
-    // ==================== DATA MODELS ====================
-
-    /**
-     * Model for upcoming payment item
-     */
     private static class UpcomingPayment {
         String supplierName;
         String invoiceNumber;
@@ -386,11 +341,8 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    /**
-     * Model for monthly profit item
-     */
     private static class MonthlyProfit {
-        Date date; // First day of the month
+        Date date;
         double income;
         double expenses;
 
