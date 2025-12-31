@@ -1,7 +1,5 @@
 package com.example.billingmanagementsystem;
 
-import static com.example.billingmanagementsystem.ApiClient.login;
-
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -9,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,16 +62,22 @@ public class LoginFragment extends Fragment {
         });
 
         signupText.setOnClickListener(v -> {
-            NavHostFragment.findNavController(LoginFragment.this)
-                    .navigate(R.id.signupFragment);
+            try {
+                NavHostFragment.findNavController(LoginFragment.this)
+                        .navigate(R.id.signupFragment);
+            } catch (Exception e) {
+                Toast.makeText(requireContext(),
+                        "Sign up not implemented yet", Toast.LENGTH_SHORT).show();
+            }
         });
-
+    }
 
     private void login(String email, String password) {
         loginButton.setEnabled(false);
         loginButton.setText("Logging in...");
 
-            ApiClient.login(getContext(), email, password, new ApiClient.ApiCallback() {            @Override
+        ApiClient.login(getContext(), email, password, new ApiClient.ApiCallback() {
+            @Override
             public void onSuccess(JSONObject response) {
                 try {
                     if (response.getBoolean("success")) {
@@ -111,7 +114,11 @@ public class LoginFragment extends Fragment {
     }
 
     private void navigateToHome() {
-        NavHostFragment.findNavController(LoginFragment.this)
-                .navigate(R.id.action_login_to_home);
+        try {
+            NavHostFragment.findNavController(LoginFragment.this)
+                    .navigate(R.id.action_login_to_home);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Navigation error", Toast.LENGTH_SHORT).show();
+        }
     }
 }
