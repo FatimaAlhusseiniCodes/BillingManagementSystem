@@ -1,19 +1,19 @@
 package com.example.billingmanagementsystem;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private NavController navController;
     private AppBarConfiguration appBarConfiguration;
 
     @Override
@@ -21,47 +21,43 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Find views
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);  // ← ADD THIS LINE
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-
-        // Setup toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Get NavController
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.nav_host_fragment);
-        navController = navHostFragment.getNavController();
+        NavHostFragment navHostFragment =
+                (NavHostFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.nav_host_fragment);
 
-        // Setup AppBarConfiguration with top-level destinations
-        appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.homeFragment,              // Home
-                R.id.invoiceFragment,           // Invoices
-                R.id.salesReceiptFragment,      // Sales Receipts
-                R.id.paymentsReceivedFragment,  // Payments
-                R.id.incomesFragment,           // Incomes
-                R.id.expensesFragment,          // Expenses
-                R.id.profitFragment,            // Profit
-                R.id.settingsFragment           // Settings
-        )
-                .setOpenableLayout(drawer)
-                .build();
+        NavController navController = navHostFragment.getNavController();
 
-        // Setup toolbar with navigation
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        appBarConfiguration =
+                new AppBarConfiguration.Builder(navController.getGraph()).build();
 
-        // Setup navigation view (drawer)
-        NavigationUI.setupWithNavController(navigationView, navController);
-
-        // Setup bottom navigation
-        NavigationUI.setupWithNavController(bottomNav, navController);
+        NavigationUI.setupActionBarWithNavController(
+                this, navController, appBarConfiguration);
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_filter) {
+            PaymentsReceivedFragment fragment =
+                    (PaymentsReceivedFragment) getSupportFragmentManager()
+                            .findFragmentById(R.id.nav_host_fragment)
+                            .getChildFragmentManager()
+                            .getFragments()
+                            .get(0);
+
+            fragment.sortList();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

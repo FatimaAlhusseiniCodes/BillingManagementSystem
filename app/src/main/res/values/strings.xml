@@ -2,4 +2,14 @@
     <string name="app_name">BillingManagementSystem</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">PaymentsNavApp</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="payments_received">Payments Received</string>
+    <string name="all">ALL</string>
+    <string name="record_payment">Record Payment</string>
+    <string name="customer_name">customer name</string>
+    <string name="start_typing_to_select_a_customer">start_typing_to_select_a_customer</string>
+    <string name="search">Search</string>
+    <string name="filter">Filter</string>
+    <string name="save">Save</string>
 </resources>
