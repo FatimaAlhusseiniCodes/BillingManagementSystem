@@ -21,9 +21,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize API Client
-        ApiClient.init(this);
-
         // Find views
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);  // ← ADD THIS LINE
@@ -31,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
         // Setup toolbar
-        //setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
 
         // Get NavController
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
