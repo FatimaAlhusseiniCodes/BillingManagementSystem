@@ -43,4 +43,6 @@
     <color name="income_amount">#4CAF50</color>
     <color name="black" tools:ignore="DuplicateDefinition">#FF000000</color>
     <color name="white" tools:ignore="DuplicateDefinition">#FFFFFFFF</color><!-- Green (money in) -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
 </resources>

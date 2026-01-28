@@ -2,53 +2,91 @@ package com.example.billingmanagementsystem;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.example.billingmanagementsystem.databinding.FragmentPaymentsReceivedBinding;
 
 import java.util.ArrayList;
-import java.util.Collections;
-
+import java.util.List;
 
 public class PaymentsReceivedFragment extends Fragment {
-    ArrayList<String> paymentsList;
-    PaymentsAdapter adapter;
+    private PaymentAdapter adapter;
+    private PaymentViewModel paymentViewModel;
+    private FragmentPaymentsReceivedBinding binding;
 
-    @Nullable
     @Override
     public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
+            @NonNull LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState
     ) {
 
-        View view = inflater.inflate(
-                R.layout.fragment_payments_received,
-                container,
-                false
-        );
+        binding = FragmentPaymentsReceivedBinding.inflate(inflater, container, false);
+        return binding.getRoot();
 
-        Button btnRecordPayment = view.findViewById(R.id.btnRecordPayment);
-
-        btnRecordPayment.setOnClickListener(v ->
-                Navigation.findNavController(v)
-                        .navigate(R.id.action_payments_to_record)
-        );
-
-        return view;
     }
 
-    public void sortList() {
-        Collections.sort(paymentsList);
-        adapter.notifyDataSetChanged();
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        paymentViewModel = new ViewModelProvider(requireActivity()).get(PaymentViewModel.class);
+
+        adapter = new PaymentAdapter(new ArrayList<>());
+        binding.recyclerViewPayments.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerViewPayments.setAdapter(adapter);
+        paymentViewModel.getPayments().observe(getViewLifecycleOwner(), newList -> {
+            adapter.setList(newList);
+
+            binding.fabAddPayment.setOnClickListener(v -> {
+                Navigation.findNavController(v).navigate(R.id.action_paymentsReceivedFragment_to_recordPaymentFragment);
+            });
+
+            binding.toolbarReceived.inflateMenu(R.menu.menu_payments_received);
+
+            MenuItem searchItem = binding.toolbarReceived.getMenu().findItem(R.id.action_search);
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    List<payment> filteredList = new ArrayList<>();
+
+                    List<payment> currentPayments = paymentViewModel.getPayments().getValue();
+
+                    if (currentPayments != null) {
+                        for (payment p : currentPayments) {
+                            if (p.getCustomerName().toLowerCase().contains(newText.toLowerCase())) {
+                                filteredList.add(p);
+                            }
+                        }
+                    }
+
+                    adapter.setList(filteredList);
+                    return true;
+                }
+
+            });
+
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
 }
-
-
-

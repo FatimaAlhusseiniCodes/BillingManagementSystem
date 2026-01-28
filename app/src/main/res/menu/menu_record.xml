@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/action_save"
-        android:title="@string/save"
-        app:showAsAction="always"/>
+        android:title="SAVE"
+        android:titleTextColor="@android:color/white"
+        app:showAsAction="always" />
 </menu>

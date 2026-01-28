@@ -100,5 +100,52 @@
         android:id="@+id/addExpenseFragment"
         android:name="com.example.billingmanagementsystem.AddExpenseFragment"
         android:label="Add Expense" />
+    <fragment
+        android:id="@+id/paymentsReceivedFragment"
+        android:name="com.example.billingmanagementsystem.PaymentsReceivedFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_payments_received" >
+
+        <action
+            android:id="@+id/action_paymentsReceivedFragment_to_recordPaymentFragment"
+            app:destination="@id/recordPaymentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordPaymentFragment"
+        android:name="com.example.billingmanagementsystem.RecordPaymentFragment"
+        android:label="Record Payment"
+        tools:layout="@layout/fragment_record_payment" >
+
+        <action
+            android:id="@+id/action_recordPayment_to_customerDetails"
+            app:destination="@id/customerDetailsFragment" />
+        <action
+            android:id="@+id/action_recordPaymentFragment_to_newCustomerFragment"
+            app:destination="@id/newCustomerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newCustomerFragment"
+        android:name="com.example.billingmanagementsystem.NewCustomerFragment"
+        android:label="NewCustomerFragment"
+        tools:layout="@layout/fragment_new_customer"/>
+
+    <fragment
+        android:id="@+id/customerDetailsFragment"
+        android:name="com.example.billingmanagementsystem.CustomerDetailsFragment"
+        android:label="Record Payment"
+        tools:layout="@layout/fragment_customer_details" />
+
+    <fragment
+        android:id="@+id/paymentReceiptFragment"
+        android:name="com.example.billingmanagementsystem.PaymentReceiptFragment"
+        android:label="Payment Receipt"
+        tools:layout="@layout/fragment_payment_receipt">
+
+        <action
+            android:id="@+id/action_paymentReceiptFragment_to_paymentsReceivedFragment"
+            app:destination="@id/paymentReceiptFragment" />
+    </fragment>
+
+
 
 </navigation>

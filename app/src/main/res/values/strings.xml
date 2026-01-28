@@ -12,4 +12,28 @@
     <string name="search">Search</string>
     <string name="filter">Filter</string>
     <string name="save">Save</string>
+    <string name="app_name">PaymentApp</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Payments Received</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="filter">Filter</string>
+    <string name="search">Search</string>
+    <string name="record_payment">Record Payment</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="salutations_array">
+        <item>Mr.</item>
+        <item>Mrs.</item>
+        <item>Ms.</item>
+        <item>Dr.</item>
+    </string-array>
+    <string-array name="payment_modes">
+        <item>Check</item>
+        <item>Cash</item>
+        <item>Bank Transfer</item>
+        <item>Credit Card</item>
+        <item>Bank Remittance</item>
+    </string-array>
 </resources>
