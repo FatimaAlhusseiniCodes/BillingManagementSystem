@@ -28,7 +28,6 @@ import java.util.Locale;
  */
 public class AddExpenseFragment extends Fragment {
 
-    private Toolbar toolbar;
     private TextInputEditText editTextTitle;
     private MaterialAutoCompleteTextView autoCompleteCategory;
     private TextInputEditText editTextAmount;
@@ -67,17 +66,12 @@ public class AddExpenseFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Initialize views
-        toolbar = view.findViewById(R.id.toolbar);
         editTextTitle = view.findViewById(R.id.editTextTitle);
         autoCompleteCategory = view.findViewById(R.id.autoCompleteCategory);
         editTextAmount = view.findViewById(R.id.editTextAmount);
         editTextDate = view.findViewById(R.id.editTextDate);
         editTextNotes = view.findViewById(R.id.editTextNotes);
         buttonSaveExpense = view.findViewById(R.id.buttonSaveExpense);
-
-        // Setup toolbar
-        setupToolbar();
-
         // Setup category dropdown
         setupCategoryDropdown();
 
@@ -90,12 +84,6 @@ public class AddExpenseFragment extends Fragment {
         // Set today's date as default
         selectedDate = Calendar.getInstance();
         editTextDate.setText(dateFormat.format(selectedDate.getTime()));
-    }
-
-    private void setupToolbar() {
-        toolbar.setNavigationOnClickListener(v -> {
-            NavHostFragment.findNavController(AddExpenseFragment.this).navigateUp();
-        });
     }
 
     private void setupCategoryDropdown() {
@@ -219,10 +207,6 @@ public class AddExpenseFragment extends Fragment {
         editTextDate.setText(dateFormat.format(selectedDate.getTime()));
     }
 }
-
-
-
-
 
 
 

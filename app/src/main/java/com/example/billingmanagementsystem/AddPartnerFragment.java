@@ -30,7 +30,6 @@ import org.json.JSONObject;
 public class AddPartnerFragment extends Fragment {
 
     // UI Components
-    private Toolbar toolbar;
     private RadioGroup radioGroupPartnerType;
     private MaterialRadioButton radioCustomer, radioSupplier, radioBoth;
 
@@ -65,9 +64,6 @@ public class AddPartnerFragment extends Fragment {
         // Initialize views
         initializeViews(view);
 
-        // Setup toolbar
-        setupToolbar();
-
         // Setup listeners
         setupListeners();
 
@@ -76,8 +72,6 @@ public class AddPartnerFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
-
         radioGroupPartnerType = view.findViewById(R.id.radioGroupPartnerType);
         radioCustomer = view.findViewById(R.id.radioCustomer);
         radioSupplier = view.findViewById(R.id.radioSupplier);
@@ -97,24 +91,6 @@ public class AddPartnerFragment extends Fragment {
 
         buttonSavePartner = view.findViewById(R.id.buttonSavePartner);
         buttonCancel = view.findViewById(R.id.buttonCancel);
-    }
-
-    private void setupToolbar() {
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            }
-        }
-
-        toolbar.setNavigationOnClickListener(v -> {
-            if (hasFormData()) {
-                showCancelConfirmationDialog();
-            } else {
-                NavHostFragment.findNavController(AddPartnerFragment.this).navigateUp();
-            }
-        });
     }
 
     private void setupListeners() {

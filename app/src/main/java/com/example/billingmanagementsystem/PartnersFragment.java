@@ -35,8 +35,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class PartnersFragment extends Fragment implements PartnerAdapter.OnPartnerClickListener {
-
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private RecyclerView recyclerView;
     private FloatingActionButton fabAddPartner;
@@ -71,7 +69,6 @@ public class PartnersFragment extends Fragment implements PartnerAdapter.OnPartn
         super.onViewCreated(view, savedInstanceState);
 
         initializeViews(view);
-        setupToolbar();
         setupRecyclerView();
         setupTabs();
         setupFAB();
@@ -87,39 +84,10 @@ public class PartnersFragment extends Fragment implements PartnerAdapter.OnPartn
     }
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
         tabLayout = view.findViewById(R.id.tabLayout);
         recyclerView = view.findViewById(R.id.rv_partners);
         fabAddPartner = view.findViewById(R.id.fab_add_partner);
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
-    }
-
-    private void setupToolbar() {
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        }
-
-        if (getActivity() != null) {
-            drawerLayout = getActivity().findViewById(R.id.drawer_layout);
-
-            if (drawerLayout != null) {
-                drawerToggle = new ActionBarDrawerToggle(
-                        getActivity(),
-                        drawerLayout,
-                        toolbar,
-                        R.string.navigation_drawer_open,
-                        R.string.navigation_drawer_close
-                );
-
-                drawerLayout.addDrawerListener(drawerToggle);
-                drawerToggle.syncState();
-
-                if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
-                }
-            }
-        }
     }
 
     private void setupRecyclerView() {
@@ -152,7 +120,7 @@ public class PartnersFragment extends Fragment implements PartnerAdapter.OnPartn
     private void setupFAB() {
         fabAddPartner.setOnClickListener(v -> {
             NavHostFragment.findNavController(PartnersFragment.this)
-                    .navigate(R.id.addPartnerFragment);
+                    .navigate(R.id.action_partners_to_addPartner);
         });
     }
 

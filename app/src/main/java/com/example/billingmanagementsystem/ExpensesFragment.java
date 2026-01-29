@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
@@ -36,8 +35,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ExpensesFragment extends Fragment implements ExpenseAdapter.OnExpenseClickListener {
-
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private RecyclerView recyclerView;
     private FloatingActionButton fabAddExpense;
@@ -72,7 +69,6 @@ public class ExpensesFragment extends Fragment implements ExpenseAdapter.OnExpen
         super.onViewCreated(view, savedInstanceState);
 
         initializeViews(view);
-        setupToolbar();
         setupRecyclerView();
         setupTabs();
         setupFAB();
@@ -88,40 +84,13 @@ public class ExpensesFragment extends Fragment implements ExpenseAdapter.OnExpen
     }
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
         tabLayout = view.findViewById(R.id.tabLayout);
         recyclerView = view.findViewById(R.id.rv_expenses);
         fabAddExpense = view.findViewById(R.id.fab_add_expense);
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
     }
 
-    private void setupToolbar() {
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        }
 
-        if (getActivity() != null) {
-            drawerLayout = getActivity().findViewById(R.id.drawer_layout);
-
-            if (drawerLayout != null) {
-                drawerToggle = new ActionBarDrawerToggle(
-                        getActivity(),
-                        drawerLayout,
-                        toolbar,
-                        R.string.navigation_drawer_open,
-                        R.string.navigation_drawer_close
-                );
-
-                drawerLayout.addDrawerListener(drawerToggle);
-                drawerToggle.syncState();
-
-                if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
-                }
-            }
-        }
-    }
 
     private void setupRecyclerView() {
         adapter = new ExpenseAdapter(this);
@@ -153,7 +122,8 @@ public class ExpensesFragment extends Fragment implements ExpenseAdapter.OnExpen
 
     private void setupFAB() {
         fabAddExpense.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Add Expense (Coming soon)", Toast.LENGTH_SHORT).show();
+            NavHostFragment.findNavController(ExpensesFragment.this)
+                    .navigate(R.id.action_expenses_to_addExpense);
         });
     }
 
