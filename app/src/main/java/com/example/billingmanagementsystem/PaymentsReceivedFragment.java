@@ -58,6 +58,7 @@ public class PaymentsReceivedFragment extends Fragment {
             public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
                 inflater.inflate(R.menu.menu_payments_received, menu);
 
+
                 MenuItem searchItem = menu.findItem(R.id.action_search);
                 SearchView searchView = (SearchView) searchItem.getActionView();
 

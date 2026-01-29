@@ -466,6 +466,31 @@ public class ApiClient {
         }
     }
 
+    /**
+     * Update user profile
+     */
+    public static void updateProfile(Context context, int userId, String businessName,
+                                     int taxPercentage, String currency, String currentPassword, String newPassword,
+                                     ApiCallback callback) {
+        try {
+            JSONObject params = new JSONObject();
+            params.put("user_id", userId);
+            params.put("business_name", businessName);
+            params.put("tax_percentage", taxPercentage);
+            params.put("base_currency", currency);
+
+            // Only include password fields if changing password
+            if (currentPassword != null && newPassword != null) {
+                params.put("current_password", currentPassword);
+                params.put("new_password", newPassword);
+            }
+
+            put(context, ApiConfig.UPDATE_USER, params, callback);
+        } catch (JSONException e) {
+            callback.onError("Failed to create request: " + e.getMessage());
+        }
+    }
+
     // ==================== HELPER METHODS ====================
 
     /**
