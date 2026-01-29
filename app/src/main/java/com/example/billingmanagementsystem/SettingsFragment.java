@@ -14,6 +14,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -75,9 +76,9 @@ public class SettingsFragment extends Fragment {
 
     private void setupListeners() {
         buttonEditProfile.setOnClickListener(v -> {
-            Toast.makeText(getContext(),
-                    "Edit Profile feature coming soon!",
-                    Toast.LENGTH_SHORT).show();
+            // Navigate to Edit Profile
+            NavHostFragment.findNavController(SettingsFragment.this)
+                    .navigate(R.id.action_settings_to_editProfile);
         });
 
         buttonLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
