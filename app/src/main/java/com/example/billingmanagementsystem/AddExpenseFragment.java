@@ -22,6 +22,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Fragment for adding manual expenses
@@ -170,29 +172,87 @@ public class AddExpenseFragment extends Fragment {
             return;
         }
 
-        // Create expense object
-        Expense expense = new Expense(
-                String.valueOf(System.currentTimeMillis()), // id
-                title,
-                amount,
-                selectedDate.getTimeInMillis(),
-                category,
-                notes
-        );
+        // Disable button to prevent double-click
+        buttonSaveExpense.setEnabled(false);
+        buttonSaveExpense.setText("Saving...");
 
-        // TODO: Save to database
-        // expenseRepository.insert(expense);
+        // Get user ID from session
+        SessionManager session = new SessionManager(requireContext());
+        int userId = session.getUserId();
 
-        // For now, save to DataHolder (temporary)
-        DataHolder.getInstance().addExpense(expense);
+        // Format date for API (yyyy-MM-dd)
+        SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String dateStr = apiDateFormat.format(selectedDate.getTime());
 
-        // Show success message
-        Snackbar.make(requireView(),
-                "Expense saved successfully!",
-                Snackbar.LENGTH_SHORT).show();
+        // Get category ID
+        int categoryId = getCategoryId(category);
 
-        // Navigate back
-        NavHostFragment.findNavController(AddExpenseFragment.this).navigateUp();
+        // Call API to save expense
+        ApiClient.createManualExpense(requireContext(), userId, categoryId, amount, dateStr, title,
+                new ApiClient.ApiCallback() {
+                    @Override
+                    public void onSuccess(JSONObject response) {
+                        if (!isAdded()) return;
+
+                        try {
+                            if (response.getBoolean("success")) {
+                                Snackbar.make(requireView(),
+                                                "✓ Expense saved successfully!",
+                                                Snackbar.LENGTH_SHORT)
+                                        .setBackgroundTint(0xFF4CAF50)
+                                        .show();
+
+                                // Navigate back after short delay
+                                requireView().postDelayed(() -> {
+                                    if (isAdded()) {
+                                        NavHostFragment.findNavController(AddExpenseFragment.this)
+                                                .navigateUp();
+                                    }
+                                }, 500);
+                            } else {
+                                String message = response.optString("message", "Failed to save expense");
+                                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                                resetButton();
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            resetButton();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        if (!isAdded()) return;
+                        Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+                        resetButton();
+                    }
+                });
+    }
+
+    private void resetButton() {
+        if (buttonSaveExpense != null) {
+            buttonSaveExpense.setEnabled(true);
+            buttonSaveExpense.setText("Save Expense");
+        }
+    }
+
+    // Map category name to category ID based on your Categories table
+    private int getCategoryId(String categoryName) {
+        switch (categoryName) {
+            case "Office Supplies": return 1;
+            case "Utilities": return 2;
+            case "Rent": return 3;
+            case "Meals & Entertainment": return 4;
+            case "Transportation": return 5;
+            case "Equipment": return 6;
+            case "Marketing": return 7;
+            case "Professional Services": return 8;
+            case "Insurance": return 9;
+            case "Maintenance": return 10;
+            case "Salaries": return 11;
+            case "Other": return 12;
+            default: return 1;
+        }
     }
 
     /**

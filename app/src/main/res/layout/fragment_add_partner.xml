@@ -142,22 +142,25 @@
                         android:textColor="#757575"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Radio Group with Beautiful Cards -->
-                    <RadioGroup
-                        android:id="@+id/radioGroupPartnerType"
+                    <!-- Partner Type Options (No RadioGroup - handled manually) -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
                         <!-- Customer Option -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardCustomer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="12dp"
                             app:cardElevation="1dp"
                             app:cardCornerRadius="8dp"
                             app:strokeColor="#4CAF50"
-                            app:strokeWidth="2dp">
+                            app:strokeWidth="2dp"
+                            app:cardBackgroundColor="#E8F5E9"
+                            android:clickable="true"
+                            android:focusable="true">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -210,13 +213,16 @@
 
                         <!-- Supplier Option -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardSupplier"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="12dp"
                             app:cardElevation="1dp"
                             app:cardCornerRadius="8dp"
                             app:strokeColor="#2196F3"
-                            app:strokeWidth="2dp">
+                            app:strokeWidth="2dp"
+                            android:clickable="true"
+                            android:focusable="true">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -268,12 +274,15 @@
 
                         <!-- Both Option -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardBoth"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             app:cardElevation="1dp"
                             app:cardCornerRadius="8dp"
                             app:strokeColor="#FF9800"
-                            app:strokeWidth="2dp">
+                            app:strokeWidth="2dp"
+                            android:clickable="true"
+                            android:focusable="true">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -323,7 +332,7 @@
 
                         </com.google.android.material.card.MaterialCardView>
 
-                    </RadioGroup>
+                    </LinearLayout>
 
                 </LinearLayout>
 

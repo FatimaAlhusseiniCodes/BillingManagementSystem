@@ -74,7 +74,7 @@ public class ApiConfig {
 
     // ==================== MANUAL EXPENSE ENDPOINTS ====================
 
-    public static final String CREATE_MANUAL_EXPENSE = BASE_URL + "api/manual_expenses/create.php";
+    public static final String CREATE_MANUAL_EXPENSE = BASE_URL + "api/expenses/create.php";
     public static final String READ_MANUAL_EXPENSES = BASE_URL + "api/manual_expenses/read.php";
     public static final String UPDATE_MANUAL_EXPENSE = BASE_URL + "api/manual_expenses/update.php";
     public static final String DELETE_MANUAL_EXPENSE = BASE_URL + "api/manual_expenses/delete.php";
