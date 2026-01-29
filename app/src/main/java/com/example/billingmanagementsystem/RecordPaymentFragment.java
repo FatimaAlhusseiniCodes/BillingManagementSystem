@@ -37,7 +37,7 @@ public class RecordPaymentFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavHostFragment.findNavController(RecordPaymentFragment.this)
-                        .navigate(R.id.action_recordPaymentFragment_to_newCustomerFragment);
+                        .navigate(R.id.action_recordPaymentFragment_to_addPartnerFragment);
             }
         });
     }

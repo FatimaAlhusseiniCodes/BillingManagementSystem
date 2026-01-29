@@ -41,8 +41,5 @@
     <color name="income_invoiced">#4CAF50</color>   <!-- Green -->
     <color name="income_manual">#2196F3</color>     <!-- Blue -->
     <color name="income_amount">#4CAF50</color>
-    <color name="black" tools:ignore="DuplicateDefinition">#FF000000</color>
-    <color name="white" tools:ignore="DuplicateDefinition">#FFFFFFFF</color><!-- Green (money in) -->
-
 
 </resources>

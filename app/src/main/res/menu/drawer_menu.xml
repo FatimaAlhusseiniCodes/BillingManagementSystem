@@ -32,6 +32,9 @@
                     android:id="@+id/expensesFragment"
                     android:icon="@drawable/ic_expense"
                     android:title="Expenses" />
+                <item
+                    android:id="@+id/paymentsReceivedFragment"
+                    android:title="Payments Receveid" />
             </group>
         </menu>
     </item>

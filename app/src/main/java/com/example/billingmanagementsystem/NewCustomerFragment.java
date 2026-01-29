@@ -38,15 +38,15 @@ public class NewCustomerFragment extends Fragment {
             if (item.getItemId() == R.id.action_save) {
                 Toast.makeText(getContext(), "Customer Saved!", Toast.LENGTH_SHORT).show();
                 NavHostFragment.findNavController(this).navigateUp();
-                return true;
-            }
-            return false;
-        });
-    }
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
+                    return true;
+                }
+                return false;
+            });
+        }
+        @Override
+        public void onDestroyView() {
+            super.onDestroyView();
+            binding = null;
+        }
 
-}
+    }
