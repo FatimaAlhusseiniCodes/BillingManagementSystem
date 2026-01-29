@@ -5,86 +5,70 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
-    <!-- Login Fragment -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.billingmanagementsystem.LoginFragment"
-        android:label="Login"
-        tools:layout="@layout/fragment_login">
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
 
+        <!-- This is the action that was missing -->
         <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/homeFragment" />
     </fragment>
 
-    <!-- Home Fragment -->
+    <fragment
+        android:id="@+id/signupFragment"
+        android:name="com.example.billingmanagementsystem.SignupFragment"
+        android:label="Sign Up" />
+
+    <!-- Home Fragment Destination -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.billingmanagementsystem.HomeFragment"
-        android:label="Home"
+        android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
 
-    <!-- Invoice Fragment -->
+    <!-- Invoices Fragment (Default Start) -->
     <fragment
-        android:id="@+id/invoiceFragment"
+        android:id="@+id/invoicesFragment"
         android:name="com.example.billingmanagementsystem.InvoiceFragment"
         android:label="Invoices"
-        tools:layout="@layout/fragment_invoice">
+        tools:layout="@layout/fragment_invoice" />
 
-        <action
-            android:id="@+id/action_invoiceFragment_to_addInvoiceFragment"
-            app:destination="@id/addInvoiceFragment" />
-    </fragment>
-
-    <!-- Add Invoice Fragment -->
     <fragment
         android:id="@+id/addInvoiceFragment"
-        android:name="com.example.billingmanagementsystem.AddInvoiceFragment"
-        android:label="New Invoice"
-        tools:layout="@layout/fragment_add_invoice">
+        android:name="com.example.billingmanagementsystem.InvoiceFragment"
+        android:label="Add Invoices"
+        tools:layout="@layout/fragment_add_invoice" />
 
-    <!--  <action
-       android:id="@+id/action_addInvoiceFragment_to_addPartnerFragment"
-       app:destination="@id/addPartnerFragment" /> -->
-</fragment>
+    <!-- Partners Fragment -->
+    <fragment
+        android:id="@+id/partnersFragment"
+        android:name="com.example.billingmanagementsystem.PartnersFragment"
+        android:label="Partners"
+        tools:layout="@layout/fragment_partners" />
 
-<!-- Partner Fragment -->
-    <!-- <fragment
+    <!-- Add Partner Fragment -->
+    <fragment
         android:id="@+id/addPartnerFragment"
         android:name="com.example.billingmanagementsystem.AddPartnerFragment"
         android:label="Add Partner"
-        tools:layout="@layout/fragment_partner" />
-       -->
-    <!-- Sales Receipt Fragment -->
-    <fragment
-        android:id="@+id/salesReceiptFragment"
-        android:name="com.example.billingmanagementsystem.SalesReceiptFragment"
-        android:label="Sales Receipts"
-        tools:layout="@layout/fragment_sales_receipt" />
+        tools:layout="@layout/fragment_add_partner" />
 
-    <!-- Payments Received Fragment -->
-    <!--
-    <fragment
-        android:id="@+id/paymentsReceivedFragment"
-        android:name="com.example.billingmanagementsystem.PaymentsReceivedFragment"
-        android:label="Payments"
-        tools:layout="@layout/fragment_payments_received" />
-    -->
-    <!-- Income Fragment -->
-    <fragment
-        android:id="@+id/incomesFragment"
-        android:name="com.example.billingmanagementsystem.IncomesFragment"
-        android:label="Incomes"
-        tools:layout="@layout/fragment_add_income" />
-
-    <!-- Expense Fragment -->
+    <!-- Expenses Fragment -->
     <fragment
         android:id="@+id/expensesFragment"
         android:name="com.example.billingmanagementsystem.ExpensesFragment"
         android:label="Expenses"
         tools:layout="@layout/fragment_expenses" />
+
+    <!-- Incomes Fragment -->
+    <fragment
+        android:id="@+id/incomesFragment"
+        android:name="com.example.billingmanagementsystem.IncomesFragment"
+        android:label="Incomes"
+        tools:layout="@layout/fragment_incomes" />
 
     <!-- Settings Fragment -->
     <fragment
@@ -92,18 +76,26 @@
         android:name="com.example.billingmanagementsystem.SettingsFragment"
         android:label="Settings"
         tools:layout="@layout/fragment_settings" />
-    <action
-        android:id="@+id/action_expensesFragment_to_addExpenseFragment"
-        app:destination="@id/addExpenseFragment" />
+
+    <!-- Add Income Fragment -->
+    <fragment
+        android:id="@+id/addIncomeFragment"
+        android:name="com.example.billingmanagementsystem.AddIncomeFragment"
+        android:label="Add Income"
+        tools:layout="@layout/fragment_add_income" />
+
+    <!-- Add more fragments as needed -->
+    <!-- Example: Add Expense Fragment -->
 
     <fragment
         android:id="@+id/addExpenseFragment"
         android:name="com.example.billingmanagementsystem.AddExpenseFragment"
-        android:label="Add Expense" />
+        android:label="Add Expense"
+        tools:layout="@layout/fragment_add_expense"/>
     <fragment
         android:id="@+id/paymentsReceivedFragment"
         android:name="com.example.billingmanagementsystem.PaymentsReceivedFragment"
-        android:label="@string/first_fragment_label"
+        android:label="payment received"
         tools:layout="@layout/fragment_payments_received" >
 
         <action
@@ -145,7 +137,5 @@
             android:id="@+id/action_paymentReceiptFragment_to_paymentsReceivedFragment"
             app:destination="@id/paymentReceiptFragment" />
     </fragment>
-
-
 
 </navigation>

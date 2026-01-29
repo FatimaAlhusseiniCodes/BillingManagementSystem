@@ -34,20 +34,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeClickListener {
+public class PartnersFragment extends Fragment implements PartnerAdapter.OnPartnerClickListener {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private RecyclerView recyclerView;
-    private FloatingActionButton fabAddIncome;
+    private FloatingActionButton fabAddPartner;
     private LinearLayout layoutEmptyState;
 
-    private IncomeAdapter adapter;
-    private List<Income> allIncomes;
-    private List<Income> filteredIncomes;
+    private PartnerAdapter adapter;
+    private List<Partner> allPartners;
+    private List<Partner> filteredPartners;
 
     private String currentFilter = "All";
-    private String currentSortBy = "date";
+    private String currentSortBy = "name";
     private String currentSearchQuery = "";
 
     private DrawerLayout drawerLayout;
@@ -63,7 +63,7 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_incomes, container, false);
+        return inflater.inflate(R.layout.fragment_partners, container, false);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
         setupRecyclerView();
         setupTabs();
         setupFAB();
-        loadIncomes();
+        loadPartners();
     }
 
     @Override
@@ -89,8 +89,8 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
     private void initializeViews(View view) {
         toolbar = view.findViewById(R.id.toolbar);
         tabLayout = view.findViewById(R.id.tabLayout);
-        recyclerView = view.findViewById(R.id.rv_incomes);
-        fabAddIncome = view.findViewById(R.id.fab_add_income);
+        recyclerView = view.findViewById(R.id.rv_partners);
+        fabAddPartner = view.findViewById(R.id.fab_add_partner);
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
     }
 
@@ -123,7 +123,7 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
     }
 
     private void setupRecyclerView() {
-        adapter = new IncomeAdapter(this);
+        adapter = new PartnerAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
     }
@@ -135,42 +135,38 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
                 int position = tab.getPosition();
                 switch (position) {
                     case 0: currentFilter = "All"; break;
-                    case 1: currentFilter = "Invoiced"; break;
-                    case 2: currentFilter = "Manual"; break;
+                    case 1: currentFilter = "Customer"; break;
+                    case 2: currentFilter = "Supplier"; break;
                 }
-                loadIncomes();
+                applyFiltersAndSort();
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) { }
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
     private void setupFAB() {
-        fabAddIncome.setOnClickListener(v -> {
-            try {
-                NavHostFragment.findNavController(IncomesFragment.this)
-                        .navigate(R.id.addIncomeFragment);
-            } catch (Exception e) {
-                Toast.makeText(getContext(), "Navigation not set up", Toast.LENGTH_SHORT).show();
-            }
+        fabAddPartner.setOnClickListener(v -> {
+            NavHostFragment.findNavController(PartnersFragment.this)
+                    .navigate(R.id.addPartnerFragment);
         });
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
-        inflater.inflate(R.menu.menu_incomes, menu);
+        inflater.inflate(R.menu.menu_partners, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
         if (searchItem != null) {
             SearchView searchView = (SearchView) searchItem.getActionView();
 
             if (searchView != null) {
-                searchView.setQueryHint("Search incomes...");
+                searchView.setQueryHint("Search partners...");
                 searchView.setMaxWidth(Integer.MAX_VALUE);
 
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -205,10 +201,20 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
 
         int id = item.getItemId();
 
-        if (id == R.id.sort_by_date) {
+        if (id == R.id.sort_by_name) {
+            currentSortBy = "name";
+            applyFiltersAndSort();
+            Toast.makeText(getContext(), "✓ Sorted by Name", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.sort_by_date) {
             currentSortBy = "date";
             applyFiltersAndSort();
             Toast.makeText(getContext(), "✓ Sorted by Date", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.sort_by_invoices) {
+            currentSortBy = "invoices";
+            applyFiltersAndSort();
+            Toast.makeText(getContext(), "✓ Sorted by Invoices", Toast.LENGTH_SHORT).show();
             return true;
         } else if (id == R.id.sort_by_amount) {
             currentSortBy = "amount";
@@ -216,7 +222,7 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
             Toast.makeText(getContext(), "✓ Sorted by Amount", Toast.LENGTH_SHORT).show();
             return true;
         } else if (id == R.id.action_refresh) {
-            loadIncomes();
+            loadPartners();
             Toast.makeText(getContext(), "✓ Refreshing...", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -224,73 +230,58 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadIncomes() {
-        SessionManager session = new SessionManager(getContext());
-        int userId = session.getUserId();
+    private void loadPartners() {
+        String filterType = currentFilter.equals("All") ? null : currentFilter;
 
-        String apiFilter;
-        switch (currentFilter) {
-            case "Invoiced": apiFilter = "invoiced"; break;
-            case "Manual": apiFilter = "manual"; break;
-            default: apiFilter = "all"; break;
-        }
-
-        ApiClient.getIncomes(getContext(), userId, apiFilter, new ApiClient.ApiCallback() {
+        ApiClient.getPartners(getContext(), filterType, new ApiClient.ApiCallback() {
             @Override
             public void onSuccess(JSONObject response) {
-                if (!isAdded()) return;
-
                 try {
                     if (response.getBoolean("success")) {
                         JSONArray data = response.getJSONArray("data");
-                        allIncomes = new ArrayList<>();
+                        allPartners = new ArrayList<>();
 
                         for (int i = 0; i < data.length(); i++) {
                             JSONObject item = data.getJSONObject(i);
 
-                            String type = item.optString("type", "Manual");
-                            String source = item.optString("source", "");
-                            String invoiceNumber = item.optString("invoice_number", "");
-                            String amount = item.optString("amount", "0");
-                            String apiDate = item.optString("date", "");
+                            String partnerId = String.valueOf(item.getInt("partner_id"));
+                            String name = item.getString("name");
+                            String contactName = item.optString("contact_name", "");
+                            String email = item.optString("email", "");
+                            String phone = item.optString("phone", "");
+                            String type = item.getString("type");
 
-                            String displayDate = apiDate;
-                            long millis = System.currentTimeMillis();
+                            String[] nameParts = contactName.split(" ", 2);
+                            String firstName = nameParts.length > 0 ? nameParts[0] : "";
+                            String lastName = nameParts.length > 1 ? nameParts[1] : "";
 
-                            if (!apiDate.isEmpty()) {
-                                try {
-                                    java.text.SimpleDateFormat apiFormat =
-                                            new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
-                                    java.util.Date parsed = apiFormat.parse(apiDate);
-                                    if (parsed != null) {
-                                        millis = parsed.getTime();
-                                        java.text.SimpleDateFormat displayFormat =
-                                                new java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault());
-                                        displayDate = displayFormat.format(parsed);
-                                    }
-                                } catch (java.text.ParseException ignored) { }
-                            }
+                            long currentTime = System.currentTimeMillis();
 
-                            String product = type.equalsIgnoreCase("Invoiced") && !invoiceNumber.isEmpty()
-                                    ? "Invoice " + invoiceNumber
-                                    : "";
-
-                            Income income = new Income(
+                            Partner partner = new Partner(
+                                    partnerId,
+                                    "PART-" + partnerId,
+                                    firstName,
+                                    lastName,
+                                    email,
+                                    phone,
+                                    "",
+                                    "",
+                                    "",
                                     type,
-                                    source,
+                                    name,
                                     "",
                                     "",
-                                    product,
-                                    amount,
-                                    displayDate,
-                                    "",
-                                    String.valueOf(millis)
+                                    currentTime,
+                                    currentTime,
+                                    0,
+                                    0.0,
+                                    0.0
                             );
 
-                            allIncomes.add(income);
+                            allPartners.add(partner);
                         }
 
-                        filteredIncomes = new ArrayList<>();
+                        filteredPartners = new ArrayList<>();
                         applyFiltersAndSort();
                     }
                 } catch (JSONException e) {
@@ -300,61 +291,65 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
 
             @Override
             public void onError(String error) {
-                if (!isAdded()) return;
                 Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void applyFiltersAndSort() {
-        if (allIncomes == null) allIncomes = new ArrayList<>();
-        if (filteredIncomes == null) filteredIncomes = new ArrayList<>();
-
-        filterIncomesByTab();
+        filterPartnersByTab();
 
         if (!currentSearchQuery.isEmpty()) {
             applySearch();
         }
 
-        sortIncomes(currentSortBy);
+        sortPartners(currentSortBy);
     }
 
-    private void filterIncomesByTab() {
-        filteredIncomes.clear();
+    private void filterPartnersByTab() {
+        filteredPartners.clear();
 
-        for (Income income : allIncomes) {
+        for (Partner partner : allPartners) {
             boolean matches = false;
-            String type = income.getType();
 
             switch (currentFilter) {
-                case "All": matches = true; break;
-                case "Invoiced": matches = "Invoiced".equalsIgnoreCase(type); break;
-                case "Manual": matches = !"Invoiced".equalsIgnoreCase(type); break;
+                case "All":
+                    matches = true;
+                    break;
+                case "Customer":
+                    matches = partner.isCustomer();
+                    break;
+                case "Supplier":
+                    matches = partner.isSupplier();
+                    break;
             }
 
             if (matches) {
-                filteredIncomes.add(income);
+                filteredPartners.add(partner);
             }
         }
     }
 
     private void applySearch() {
-        List<Income> searchResults = new ArrayList<>();
+        List<Partner> searchResults = new ArrayList<>();
         String query = currentSearchQuery.toLowerCase();
 
-        for (Income income : filteredIncomes) {
-            String source = income.getNameOrSource();
-            String product = income.getProduct();
+        for (Partner partner : filteredPartners) {
+            boolean matchesName = partner.getFullName().toLowerCase().contains(query);
+            boolean matchesCompany = partner.getCompanyName() != null &&
+                    partner.getCompanyName().toLowerCase().contains(query);
+            boolean matchesEmail = partner.getEmail() != null &&
+                    partner.getEmail().toLowerCase().contains(query);
+            boolean matchesPhone = partner.getPhone() != null &&
+                    partner.getPhone().contains(query);
+            boolean matchesPartnerNumber = partner.getPartnerNumber().toLowerCase().contains(query);
 
-            boolean matchesSource = source != null && source.toLowerCase().contains(query);
-            boolean matchesProduct = product != null && product.toLowerCase().contains(query);
-
-            if (matchesSource || matchesProduct) {
-                searchResults.add(income);
+            if (matchesName || matchesCompany || matchesEmail || matchesPhone || matchesPartnerNumber) {
+                searchResults.add(partner);
             }
         }
 
-        filteredIncomes = searchResults;
+        filteredPartners = searchResults;
     }
 
     private void performSearch(String query) {
@@ -362,34 +357,42 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
         applyFiltersAndSort();
     }
 
-    private void sortIncomes(String sortBy) {
+    private void sortPartners(String sortBy) {
         switch (sortBy) {
-            case "date":
-                Collections.sort(filteredIncomes, new Comparator<Income>() {
+            case "name":
+                Collections.sort(filteredPartners, new Comparator<Partner>() {
                     @Override
-                    public int compare(Income i1, Income i2) {
-                        try {
-                            long t1 = Long.parseLong(i1.getTimestamp() != null ? i1.getTimestamp() : "0");
-                            long t2 = Long.parseLong(i2.getTimestamp() != null ? i2.getTimestamp() : "0");
-                            return Long.compare(t2, t1);
-                        } catch (NumberFormatException e) {
-                            return 0;
-                        }
+                    public int compare(Partner p1, Partner p2) {
+                        return p1.getDisplayName().compareToIgnoreCase(p2.getDisplayName());
+                    }
+                });
+                break;
+
+            case "date":
+                Collections.sort(filteredPartners, new Comparator<Partner>() {
+                    @Override
+                    public int compare(Partner p1, Partner p2) {
+                        return Long.compare(p2.getDateCreatedMillis(), p1.getDateCreatedMillis());
+                    }
+                });
+                break;
+
+            case "invoices":
+                Collections.sort(filteredPartners, new Comparator<Partner>() {
+                    @Override
+                    public int compare(Partner p1, Partner p2) {
+                        return Integer.compare(p2.getTotalInvoices(), p1.getTotalInvoices());
                     }
                 });
                 break;
 
             case "amount":
-                Collections.sort(filteredIncomes, new Comparator<Income>() {
+                Collections.sort(filteredPartners, new Comparator<Partner>() {
                     @Override
-                    public int compare(Income i1, Income i2) {
-                        try {
-                            double a1 = Double.parseDouble(i1.getAmount() != null ? i1.getAmount() : "0");
-                            double a2 = Double.parseDouble(i2.getAmount() != null ? i2.getAmount() : "0");
-                            return Double.compare(a2, a1);
-                        } catch (NumberFormatException e) {
-                            return 0;
-                        }
+                    public int compare(Partner p1, Partner p2) {
+                        double amount1 = p1.getTotalAmountDue() + p1.getTotalAmountOwed();
+                        double amount2 = p2.getTotalAmountDue() + p2.getTotalAmountOwed();
+                        return Double.compare(amount2, amount1);
                     }
                 });
                 break;
@@ -399,9 +402,12 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
     }
 
     private void updateUI() {
-        adapter.setIncomes(filteredIncomes);
+        adapter.setPartners(filteredPartners);
+        updateEmptyState();
+    }
 
-        if (filteredIncomes == null || filteredIncomes.isEmpty()) {
+    private void updateEmptyState() {
+        if (filteredPartners.isEmpty()) {
             layoutEmptyState.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -411,15 +417,15 @@ public class IncomesFragment extends Fragment implements IncomeAdapter.OnIncomeC
     }
 
     @Override
-    public void onIncomeClick(Income income) {
+    public void onPartnerClick(Partner partner) {
         Toast.makeText(requireContext(),
-                "Income: " + income.getNameOrSource(),
+                "Partner: " + partner.getDisplayName(),
                 Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadIncomes();
+        loadPartners();
     }
 }

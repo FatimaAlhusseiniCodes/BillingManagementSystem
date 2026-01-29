@@ -2,8 +2,6 @@
     <string name="app_name">BillingManagementSystem</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="app_name">PaymentsNavApp</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="payments_received">Payments Received</string>
     <string name="all">ALL</string>
     <string name="record_payment">Record Payment</string>
@@ -12,17 +10,13 @@
     <string name="search">Search</string>
     <string name="filter">Filter</string>
     <string name="save">Save</string>
-    <string name="app_name">PaymentApp</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">Payments Received</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="filter">Filter</string>
-    <string name="search">Search</string>
-    <string name="record_payment">Record Payment</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string-array name="salutations_array">
         <item>Mr.</item>
         <item>Mrs.</item>

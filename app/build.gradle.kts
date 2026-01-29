@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-
+    implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.6")
     implementation("androidx.lifecycle:lifecycle-livedata:2.8.6")
 

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddManualIncomeFragment">
+    tools:context=".AddIncomeFragment">
 
     <!-- Top App Bar with Back Arrow -->
     <com.google.android.material.appbar.AppBarLayout
@@ -90,7 +90,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Source Information *"
+                        android:text="Source Information"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#1976D2"

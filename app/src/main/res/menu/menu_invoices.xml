@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Search Icon - FORCED to show -->
+    <item
+        android:id="@+id/action_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="Search"
+        app:showAsAction="always"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <!-- Sort Menu - FORCED to show -->
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Sort By"
+        app:showAsAction="always">
+
+        <menu>
+            <item
+                android:id="@+id/sort_by_name"
+                android:title="Sort by Partner Name" />
+
+            <item
+                android:id="@+id/sort_by_date"
+                android:title="Sort by Date (Newest First)" />
+
+            <item
+                android:id="@+id/sort_by_amount"
+                android:title="Sort by Amount (Highest First)" />
+        </menu>
+    </item>
+
+</menu>
