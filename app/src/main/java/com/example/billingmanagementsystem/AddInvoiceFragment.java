@@ -31,7 +31,6 @@ import java.util.Locale;
 public class AddInvoiceFragment extends Fragment {
 
     // UI Components
-    private MaterialToolbar toolbar;
     private RadioGroup radioGroupInvoiceType;
     private TextInputEditText editTextInvoiceNumber;
     private MaterialAutoCompleteTextView autoCompletePartner;
@@ -73,10 +72,6 @@ public class AddInvoiceFragment extends Fragment {
 
         // Initialize views
         initializeViews(view);
-
-        // Setup toolbar
-        setupToolbar();
-
         // Setup dropdowns
         setupPartnerDropdown();
         setupStatusDropdown();
@@ -95,7 +90,6 @@ public class AddInvoiceFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
         radioGroupInvoiceType = view.findViewById(R.id.radioGroupInvoiceType);
         editTextInvoiceNumber = view.findViewById(R.id.editTextInvoiceNumber);
         autoCompletePartner = view.findViewById(R.id.autoCompletePartner);
@@ -108,13 +102,6 @@ public class AddInvoiceFragment extends Fragment {
         textViewTotalAmount = view.findViewById(R.id.textViewTotalAmount);
         editTextNotes = view.findViewById(R.id.editTextNotes);
         buttonSaveInvoice = view.findViewById(R.id.buttonSaveInvoice);
-    }
-
-    private void setupToolbar() {
-        toolbar.setNavigationOnClickListener(v -> {
-            // Navigate back
-            NavHostFragment.findNavController(AddInvoiceFragment.this).navigateUp();
-        });
     }
 
     private void setupPartnerDropdown() {
@@ -246,15 +233,9 @@ public class AddInvoiceFragment extends Fragment {
     private void setupClickListeners() {
         // Add Partner Icon Click (the end icon)
         View.OnClickListener addPartnerListener = v -> {
-            // TODO: Navigate to Add Partner screen
-            // For now, just show a toast
-            Toast.makeText(requireContext(),
-                    "Navigate to Add Partner screen",
-                    Toast.LENGTH_SHORT).show();
-
-            // When you have the navigation action set up in nav_graph:
-            // NavHostFragment.findNavController(AddInvoiceFragment.this)
-            //     .navigate(R.id.action_addInvoiceFragment_to_addPartnerFragment);
+            // Navigate to Add Partner screen
+            NavHostFragment.findNavController(AddInvoiceFragment.this)
+                    .navigate(R.id.action_addInvoice_to_addPartner);
         };
 
         // Set click listener on the end icon

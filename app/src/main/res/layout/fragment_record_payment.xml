@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".RecordPaymentFragment">
 
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_record"
         android:layout_width="match_parent"
@@ -17,6 +18,7 @@
         app:navigationIcon="?attr/homeAsUpIndicator"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
     <TextView
         android:id="@+id/tvCustomer"

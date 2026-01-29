@@ -2,6 +2,7 @@
     <string name="app_name">BillingManagementSystem</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="payments_received">Payments Received</string>
     <string name="all">ALL</string>
     <string name="record_payment">Record Payment</string>
@@ -30,4 +31,18 @@
         <item>Credit Card</item>
         <item>Bank Remittance</item>
     </string-array>
+    <string name="customer_name_format">Customer: %1$s</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
 </resources>

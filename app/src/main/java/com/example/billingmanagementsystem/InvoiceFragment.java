@@ -39,7 +39,6 @@ import java.util.List;
 public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoiceClickListener {
 
     // UI Components
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private RecyclerView recyclerView;
     private FloatingActionButton fabAddInvoice;
@@ -83,7 +82,6 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
         initializeViews(view);
 
         // Setup components
-        setupToolbar();
         setupRecyclerView();
         setupTabs();
         setupFAB();
@@ -104,44 +102,13 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
     // ==================== INITIALIZATION ====================
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
         tabLayout = view.findViewById(R.id.tabLayout);
         recyclerView = view.findViewById(R.id.rv_invoices);
         fabAddInvoice = view.findViewById(R.id.fab_add_invoice);
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
     }
 
-    private void setupToolbar() {
-        // Set toolbar as action bar
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        }
 
-        // Get drawer layout from MainActivity
-        if (getActivity() != null) {
-            drawerLayout = getActivity().findViewById(R.id.drawer_layout);
-
-            if (drawerLayout != null) {
-                // Setup drawer toggle
-                drawerToggle = new ActionBarDrawerToggle(
-                        getActivity(),
-                        drawerLayout,
-                        toolbar,
-                        R.string.navigation_drawer_open,
-                        R.string.navigation_drawer_close
-                );
-
-                drawerLayout.addDrawerListener(drawerToggle);
-                drawerToggle.syncState();
-
-                // Enable home button
-                if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
-                }
-            }
-        }
-    }
 
     private void setupRecyclerView() {
         adapter = new InvoiceAdapter(this);
@@ -176,7 +143,7 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
         fabAddInvoice.setOnClickListener(v -> {
             // Navigate to Add Invoice screen
             NavHostFragment.findNavController(InvoiceFragment.this)
-                    .navigate(R.id.addInvoiceFragment);
+                    .navigate(R.id.action_invoices_to_addInvoice);
         });
     }
 

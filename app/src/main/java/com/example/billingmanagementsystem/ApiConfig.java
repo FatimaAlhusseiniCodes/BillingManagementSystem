@@ -19,7 +19,7 @@ public class ApiConfig {
      * - Use your actual domain or server IP
      */
     // For physical device:
-    private static final String BASE_URL = "http://192.168.1.113/billing_api/";
+    private static final String BASE_URL = "http://192.168.1.106/billing_api/";
     // For production: private static final String BASE_URL = "https://yourdomain.com/billing_api/";
 
     // ==================== USER ENDPOINTS ====================
@@ -74,7 +74,7 @@ public class ApiConfig {
 
     // ==================== MANUAL EXPENSE ENDPOINTS ====================
 
-    public static final String CREATE_MANUAL_EXPENSE = BASE_URL + "api/manual_expenses/create.php";
+    public static final String CREATE_MANUAL_EXPENSE = BASE_URL + "api/expenses/create.php";
     public static final String READ_MANUAL_EXPENSES = BASE_URL + "api/manual_expenses/read.php";
     public static final String UPDATE_MANUAL_EXPENSE = BASE_URL + "api/manual_expenses/update.php";
     public static final String DELETE_MANUAL_EXPENSE = BASE_URL + "api/manual_expenses/delete.php";

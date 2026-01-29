@@ -81,22 +81,30 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupQuickActions(View view) {
+
+        // New Invoice button
         view.findViewById(R.id.btnNewInvoice).setOnClickListener(v -> {
-            try {
-                NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.addInvoiceFragment);
-            } catch (Exception e) { }
+            // Method 1: Using action ID (recommended when action is defined)
+            NavHostFragment.findNavController(HomeFragment.this)
+                    .navigate(R.id.action_home_to_addInvoice);
         });
 
+        // New Partner button
         view.findViewById(R.id.btnNewPartner).setOnClickListener(v -> {
-            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.addPartnerFragment);
+            NavHostFragment.findNavController(HomeFragment.this)
+                    .navigate(R.id.action_home_to_addPartner);
         });
 
+        // New Expense button - goes to ADD EXPENSE (not expenses list!)
         view.findViewById(R.id.btnNewExpense).setOnClickListener(v -> {
-            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.expensesFragment);
+            NavHostFragment.findNavController(HomeFragment.this)
+                    .navigate(R.id.action_home_to_addExpense);
         });
 
+        // New Income button - goes to ADD INCOME (not incomes list!)
         view.findViewById(R.id.btnNewIncome).setOnClickListener(v -> {
-            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.incomesFragment);
+            NavHostFragment.findNavController(HomeFragment.this)
+                    .navigate(R.id.action_home_to_addIncome);
         });
     }
 

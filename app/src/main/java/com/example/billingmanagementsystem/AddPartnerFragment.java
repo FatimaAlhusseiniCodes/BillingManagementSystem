@@ -4,17 +4,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -24,15 +22,12 @@ import org.json.JSONObject;
 
 /**
  * AddPartnerFragment - form to add new partners (customers/suppliers)
- * Integrated with backend:
- * POST /api/partners/create.php via ApiClient.createPartner(...)
  */
 public class AddPartnerFragment extends Fragment {
 
-    // UI Components
-    private Toolbar toolbar;
-    private RadioGroup radioGroupPartnerType;
+    // Radio buttons (handled manually since they're inside CardViews)
     private MaterialRadioButton radioCustomer, radioSupplier, radioBoth;
+    private MaterialCardView cardCustomer, cardSupplier, cardBoth;
 
     private TextInputEditText editTextPartnerNumber;
     private TextInputEditText editTextFirstName;
@@ -65,24 +60,31 @@ public class AddPartnerFragment extends Fragment {
         // Initialize views
         initializeViews(view);
 
-        // Setup toolbar
-        setupToolbar();
+        // Setup radio button selection (manual handling)
+        setupRadioButtons();
 
         // Setup listeners
         setupListeners();
 
         // Generate partner number
         generatePartnerNumber();
+
+        // Set default selection
+        selectPartnerType("Customer");
     }
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
-
-        radioGroupPartnerType = view.findViewById(R.id.radioGroupPartnerType);
+        // Radio buttons
         radioCustomer = view.findViewById(R.id.radioCustomer);
         radioSupplier = view.findViewById(R.id.radioSupplier);
         radioBoth = view.findViewById(R.id.radioBoth);
 
+        // Card views for radio buttons
+        cardCustomer = view.findViewById(R.id.cardCustomer);
+        cardSupplier = view.findViewById(R.id.cardSupplier);
+        cardBoth = view.findViewById(R.id.cardBoth);
+
+        // Text inputs
         editTextPartnerNumber = view.findViewById(R.id.editTextPartnerNumber);
         editTextFirstName = view.findViewById(R.id.editTextFirstName);
         editTextLastName = view.findViewById(R.id.editTextLastName);
@@ -95,40 +97,65 @@ public class AddPartnerFragment extends Fragment {
         editTextTaxNumber = view.findViewById(R.id.editTextTaxNumber);
         editTextNotes = view.findViewById(R.id.editTextNotes);
 
+        // Buttons
         buttonSavePartner = view.findViewById(R.id.buttonSavePartner);
         buttonCancel = view.findViewById(R.id.buttonCancel);
     }
 
-    private void setupToolbar() {
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            }
+    private void setupRadioButtons() {
+        // Customer card/radio click
+        View.OnClickListener customerClickListener = v -> selectPartnerType("Customer");
+        radioCustomer.setOnClickListener(customerClickListener);
+        if (cardCustomer != null) {
+            cardCustomer.setOnClickListener(customerClickListener);
         }
 
-        toolbar.setNavigationOnClickListener(v -> {
-            if (hasFormData()) {
-                showCancelConfirmationDialog();
-            } else {
-                NavHostFragment.findNavController(AddPartnerFragment.this).navigateUp();
-            }
-        });
+        // Supplier card/radio click
+        View.OnClickListener supplierClickListener = v -> selectPartnerType("Supplier");
+        radioSupplier.setOnClickListener(supplierClickListener);
+        if (cardSupplier != null) {
+            cardSupplier.setOnClickListener(supplierClickListener);
+        }
+
+        // Both card/radio click
+        View.OnClickListener bothClickListener = v -> selectPartnerType("Both");
+        radioBoth.setOnClickListener(bothClickListener);
+        if (cardBoth != null) {
+            cardBoth.setOnClickListener(bothClickListener);
+        }
+    }
+
+    private void selectPartnerType(String type) {
+        selectedPartnerType = type;
+
+        // Uncheck all first
+        radioCustomer.setChecked(false);
+        radioSupplier.setChecked(false);
+        radioBoth.setChecked(false);
+
+        // Reset card backgrounds
+        if (cardCustomer != null) cardCustomer.setCardBackgroundColor(0xFFFFFFFF);
+        if (cardSupplier != null) cardSupplier.setCardBackgroundColor(0xFFFFFFFF);
+        if (cardBoth != null) cardBoth.setCardBackgroundColor(0xFFFFFFFF);
+
+        // Check the selected one and highlight card
+        switch (type) {
+            case "Customer":
+                radioCustomer.setChecked(true);
+                if (cardCustomer != null) cardCustomer.setCardBackgroundColor(0xFFE8F5E9); // Light green
+                break;
+            case "Supplier":
+                radioSupplier.setChecked(true);
+                if (cardSupplier != null) cardSupplier.setCardBackgroundColor(0xFFE3F2FD); // Light blue
+                break;
+            case "Both":
+                radioBoth.setChecked(true);
+                if (cardBoth != null) cardBoth.setCardBackgroundColor(0xFFFFF3E0); // Light orange
+                break;
+        }
     }
 
     private void setupListeners() {
-        // Partner type selection
-        radioGroupPartnerType.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.radioCustomer) {
-                selectedPartnerType = "Customer";
-            } else if (checkedId == R.id.radioSupplier) {
-                selectedPartnerType = "Supplier";
-            } else if (checkedId == R.id.radioBoth) {
-                selectedPartnerType = "Both";
-            }
-        });
-
         // Cancel button
         if (buttonCancel != null) {
             buttonCancel.setOnClickListener(v -> {
@@ -145,7 +172,6 @@ public class AddPartnerFragment extends Fragment {
     }
 
     private void generatePartnerNumber() {
-        // Placeholder, UI-only. Backend uses its own IDs.
         int nextNumber = 7;
         String partnerNumber = String.format("PART-%04d", nextNumber);
         editTextPartnerNumber.setText(partnerNumber);
@@ -178,10 +204,9 @@ public class AddPartnerFragment extends Fragment {
 
         // Disable button while sending
         buttonSavePartner.setEnabled(false);
-        buttonSavePartner.setAlpha(0.6f);
+        buttonSavePartner.setText("Saving...");
 
-        // Call ApiClient.createPartner with 7 arguments:
-        // (Context, name, contact_name, email, phone, type, ApiCallback)
+        // Call API
         ApiClient.createPartner(
                 requireContext(),
                 displayName,
@@ -194,7 +219,7 @@ public class AddPartnerFragment extends Fragment {
                     public void onSuccess(JSONObject response) {
                         // Re-enable button
                         buttonSavePartner.setEnabled(true);
-                        buttonSavePartner.setAlpha(1.0f);
+                        buttonSavePartner.setText("Save Partner");
 
                         if (!isAdded()) return;
 
@@ -205,35 +230,11 @@ public class AddPartnerFragment extends Fragment {
                         );
 
                         if (success) {
-                            int partnerId = response.optInt("partner_id", -1);
-
                             Snackbar.make(requireView(),
                                             "✓ " + message,
                                             Snackbar.LENGTH_LONG)
                                     .setBackgroundTint(0xFF4CAF50)
                                     .show();
-
-                            // Optional: local Partner object
-                            Partner newPartner = new Partner(
-                                    partnerId == -1 ? null : String.valueOf(partnerId),
-                                    partnerNumber,
-                                    firstName,
-                                    lastName,
-                                    email,
-                                    phone,
-                                    address,
-                                    city,
-                                    country,
-                                    selectedPartnerType,
-                                    companyName,
-                                    taxNumber,
-                                    notes,
-                                    System.currentTimeMillis(),
-                                    System.currentTimeMillis(),
-                                    0,
-                                    0.0,
-                                    0.0
-                            );
 
                             // Navigate back
                             NavHostFragment.findNavController(AddPartnerFragment.this).navigateUp();
@@ -251,7 +252,7 @@ public class AddPartnerFragment extends Fragment {
                     public void onError(String error) {
                         // Re-enable button
                         buttonSavePartner.setEnabled(true);
-                        buttonSavePartner.setAlpha(1.0f);
+                        buttonSavePartner.setText("Save Partner");
 
                         if (!isAdded()) return;
 

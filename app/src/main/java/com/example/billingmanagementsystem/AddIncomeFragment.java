@@ -28,7 +28,6 @@ import java.util.Locale;
 
 public class AddIncomeFragment extends Fragment {
 
-    private Toolbar toolbar;
     private TextInputEditText editTextSource;
     private TextInputEditText editTextAmount;
     private TextInputEditText editTextDate;
@@ -57,13 +56,11 @@ public class AddIncomeFragment extends Fragment {
         dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
         initializeViews(view);
-        setupToolbar();
         setupListeners();
         updateDateField();
     }
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
         editTextSource = view.findViewById(R.id.editTextSourceName);
         editTextAmount = view.findViewById(R.id.editTextAmount);
         editTextDate = view.findViewById(R.id.editTextDate);
@@ -75,23 +72,6 @@ public class AddIncomeFragment extends Fragment {
         buttonCancel = view.findViewById(R.id.buttonCancel);
     }
 
-    private void setupToolbar() {
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            }
-        }
-
-        toolbar.setNavigationOnClickListener(v -> {
-            if (hasFormData()) {
-                showCancelConfirmationDialog();
-            } else {
-                navigateBack();
-            }
-        });
-    }
 
     private void setupListeners() {
         if (editTextDate != null) {

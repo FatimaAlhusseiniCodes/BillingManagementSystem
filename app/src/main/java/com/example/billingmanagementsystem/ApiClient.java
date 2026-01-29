@@ -28,9 +28,6 @@ public class ApiClient {
 
     // ==================== INITIALIZATION ====================
 
-    /**
-     * Initialize Volley RequestQueue (call once in Application or MainActivity)
-     */
     public static void init(Context context) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(context.getApplicationContext());
