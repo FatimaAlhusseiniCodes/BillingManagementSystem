@@ -1,5 +1,6 @@
 package com.example.billingmanagementsystem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -25,7 +24,6 @@ import org.json.JSONObject;
 
 public class SettingsFragment extends Fragment {
 
-    private Toolbar toolbar;
     private TextView textViewProfileInitial;
     private TextView textViewUserName;
     private TextView textViewUserEmail;
@@ -50,7 +48,6 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initializeViews(view);
-        setupToolbar();
         loadUserProfile();
         setupListeners();
     }
@@ -64,7 +61,6 @@ public class SettingsFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
         textViewProfileInitial = view.findViewById(R.id.textViewProfileInitial);
         textViewUserName = view.findViewById(R.id.textViewUserName);
         textViewUserEmail = view.findViewById(R.id.textViewUserEmail);
@@ -75,33 +71,7 @@ public class SettingsFragment extends Fragment {
         buttonLogout = view.findViewById(R.id.buttonLogout);
     }
 
-    private void setupToolbar() {
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        }
 
-        if (getActivity() != null) {
-            drawerLayout = getActivity().findViewById(R.id.drawer_layout);
-
-            if (drawerLayout != null) {
-                drawerToggle = new ActionBarDrawerToggle(
-                        getActivity(),
-                        drawerLayout,
-                        toolbar,
-                        R.string.navigation_drawer_open,
-                        R.string.navigation_drawer_close
-                );
-
-                drawerLayout.addDrawerListener(drawerToggle);
-                drawerToggle.syncState();
-
-                if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
-                }
-            }
-        }
-    }
 
     private void setupListeners() {
         buttonEditProfile.setOnClickListener(v -> {
@@ -145,7 +115,7 @@ public class SettingsFragment extends Fragment {
             textViewAppVersion.setText("v1.0.0");
         }
 
-        textViewBuildDate.setText("December 2024");
+        textViewBuildDate.setText("January 2026");
     }
 
     private void showLogoutConfirmationDialog() {
@@ -183,14 +153,7 @@ public class SettingsFragment extends Fragment {
                                 .show();
 
                         requireView().postDelayed(() -> {
-                            try {
-                                NavHostFragment.findNavController(SettingsFragment.this)
-                                        .navigate(R.id.loginFragment);
-                            } catch (Exception e) {
-                                if (getActivity() != null) {
-                                    getActivity().finish();
-                                }
-                            }
+                            goToLogin();
                         }, 1000);
                     }
                 } catch (JSONException e) {
@@ -204,19 +167,19 @@ public class SettingsFragment extends Fragment {
 
             @Override
             public void onError(String error) {
+                // Still logout locally even if API fails
                 session.logout();
-
                 Toast.makeText(getContext(), "Logged out locally", Toast.LENGTH_SHORT).show();
-
-                try {
-                    NavHostFragment.findNavController(SettingsFragment.this)
-                            .navigate(R.id.loginFragment);
-                } catch (Exception e) {
-                    if (getActivity() != null) {
-                        getActivity().finish();
-                    }
-                }
+                goToLogin();
             }
         });
+    }
+
+    // NEW METHOD: Navigate to LoginActivity
+    private void goToLogin() {
+        Intent intent = new Intent(requireActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 }

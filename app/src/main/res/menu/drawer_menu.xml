@@ -10,7 +10,7 @@
             android:title="Home" />
 
         <item
-            android:id="@+id/invoiceFragment"
+            android:id="@+id/invoicesFragment"
             android:icon="@drawable/ic_invoice"
             android:title="Invoices" />
 
@@ -18,16 +18,6 @@
             android:id="@+id/partnersFragment"
             android:icon="@drawable/ic_partner"
             android:title="Partners" />
-
-        <item
-            android:id="@+id/salesReceiptFragment"
-            android:icon="@drawable/ic_sales"
-            android:title="Sales Receipts" />
-
-        <item
-            android:id="@+id/paymentsReceivedFragment"
-            android:icon="@drawable/ic_payment"
-            android:title="Payments Received" />
     </group>
 
     <item android:title="Financial Reports">

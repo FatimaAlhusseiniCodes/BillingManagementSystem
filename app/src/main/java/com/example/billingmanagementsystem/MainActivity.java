@@ -1,12 +1,15 @@
 package com.example.billingmanagementsystem;
 
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -23,40 +26,49 @@ public class MainActivity extends AppCompatActivity {
 
         // Find views
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);  // ← ADD THIS LINE
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
         // Setup toolbar
-        setSupportActionBar(toolbar);
-
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
         // Get NavController
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
+
+        if (navHostFragment == null) {
+            return;
+        }
+
         navController = navHostFragment.getNavController();
 
-        // Setup AppBarConfiguration with top-level destinations
+        // Setup AppBarConfiguration - use only fragments that EXIST in your nav_graph
         appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.homeFragment,              // Home
-                R.id.invoiceFragment,           // Invoices
-                R.id.salesReceiptFragment,      // Sales Receipts
-                R.id.paymentsReceivedFragment,  // Payments
-                R.id.incomesFragment,           // Incomes
-                R.id.expensesFragment,          // Expenses
-                R.id.profitFragment,            // Profit
-                R.id.settingsFragment           // Settings
+                R.id.homeFragment,
+                R.id.invoicesFragment,
+                R.id.partnersFragment,
+                R.id.incomesFragment,
+                R.id.expensesFragment,
+                R.id.settingsFragment
         )
                 .setOpenableLayout(drawer)
                 .build();
 
-        // Setup toolbar with navigation
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        if (toolbar != null) {
+            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        }
 
         // Setup navigation view (drawer)
-        NavigationUI.setupWithNavController(navigationView, navController);
+        if (navigationView != null) {
+            NavigationUI.setupWithNavController(navigationView, navController);
+        }
 
         // Setup bottom navigation
-        NavigationUI.setupWithNavController(bottomNav, navController);
+        if (bottomNav != null) {
+            NavigationUI.setupWithNavController(bottomNav, navController);
+        }
     }
 
     @Override

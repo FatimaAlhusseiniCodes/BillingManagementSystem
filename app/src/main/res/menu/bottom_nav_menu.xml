@@ -7,18 +7,18 @@
         android:title="Home" />
 
     <item
-        android:id="@+id/invoiceFragment"
+        android:id="@+id/invoicesFragment"
         android:icon="@drawable/ic_invoice"
         android:title="Invoices" />
 
     <item
-        android:id="@+id/salesReceiptFragment"
+        android:id="@+id/incomesFragment"
         android:icon="@drawable/ic_sales"
-        android:title="Sales" />
+        android:title="Income" />
 
     <item
-        android:id="@+id/profitFragment"
+        android:id="@+id/expensesFragment"
         android:icon="@drawable/ic_profits"
-        android:title="Reports" />
+        android:title="Expenses" />
 
 </menu>
