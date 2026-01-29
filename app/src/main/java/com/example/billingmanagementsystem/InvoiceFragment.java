@@ -36,7 +36,7 @@ import java.util.List;
  * InvoiceFragment - Complete implementation with Toolbar, Search, Sort, and Drawer
  * Displays invoices with filtering, searching, and sorting capabilities
  */
-public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoiceClickListener {
+public class InvoiceFragment extends Fragment implements Invoiceadapter.OnInvoiceClickListener {
 
     // UI Components
     private TabLayout tabLayout;
@@ -45,7 +45,7 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
     private LinearLayout layoutEmptyState;
 
     // Data & Adapter
-    private InvoiceAdapter adapter;
+    private Invoiceadapter adapter;
     private List<Invoice> allInvoices;
     private List<Invoice> filteredInvoices;
 
@@ -111,7 +111,7 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
 
     private void setupRecyclerView() {
-        adapter = new InvoiceAdapter(this);
+        adapter = new Invoiceadapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
     }
