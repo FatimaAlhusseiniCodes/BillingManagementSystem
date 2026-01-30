@@ -33,7 +33,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class InvoiceFragment extends Fragment implements Invoiceadapter.OnInvoiceClickListener {
+public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoiceClickListener {
+/**
+ * InvoiceFragment - Complete implementation with Toolbar, Search, Sort, and Drawer
+ * Displays invoices with filtering, searching, and sorting capabilities
+ */
 
     // UI Components
     private TabLayout tabLayout;
@@ -43,7 +47,7 @@ public class InvoiceFragment extends Fragment implements Invoiceadapter.OnInvoic
     private ProgressBar progressBar;
 
     // Data & Adapter
-    private Invoiceadapter adapter;
+    private InvoiceAdapter adapter;
     private List<Invoice> allInvoices = new ArrayList<>();         // FIXED: Initialize here
     private List<Invoice> filteredInvoices = new ArrayList<>();    // FIXED: Initialize here
 
@@ -103,7 +107,7 @@ public class InvoiceFragment extends Fragment implements Invoiceadapter.OnInvoic
     }
 
     private void setupRecyclerView() {
-        adapter = new Invoiceadapter(this);
+        adapter = new InvoiceAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
     }

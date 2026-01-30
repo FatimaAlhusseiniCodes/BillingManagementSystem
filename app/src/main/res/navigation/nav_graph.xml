@@ -131,7 +131,7 @@
             android:id="@+id/action_recordPayment_to_customerDetails"
             app:destination="@id/customerDetailsFragment" />
         <action
-            android:id="@+id/action_recordPaymentFragment_to_addPartnerFragment"
+            android:id="@+id/action_recordPaymentFragment_to_newCustomerFragment"
             app:destination="@id/addPartnerFragment" />
     </fragment>
 
