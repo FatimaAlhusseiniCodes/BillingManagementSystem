@@ -8,14 +8,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
@@ -26,16 +25,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * InvoiceFragment - Complete implementation with Toolbar, Search, Sort, and Drawer
- * Displays invoices with filtering, searching, and sorting capabilities
- */
 public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoiceClickListener {
 
     // UI Components
@@ -43,27 +40,25 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
     private RecyclerView recyclerView;
     private FloatingActionButton fabAddInvoice;
     private LinearLayout layoutEmptyState;
+    private ProgressBar progressBar;
 
     // Data & Adapter
     private InvoiceAdapter adapter;
-    private List<Invoice> allInvoices;
-    private List<Invoice> filteredInvoices;
+    private List<Invoice> allInvoices = new ArrayList<>();         // FIXED: Initialize here
+    private List<Invoice> filteredInvoices = new ArrayList<>();    // FIXED: Initialize here
 
     // State tracking
-    private String currentFilter = "Unpaid"; // Default tab
-    private String currentSortBy = "date"; // Default sort
+    private String currentFilter = "All"; // Default to All
+    private String currentSortBy = "date";
     private String currentSearchQuery = "";
 
     // Drawer
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
-    // ==================== LIFECYCLE METHODS ====================
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // CRITICAL: Enable options menu for this fragment
         setHasOptionsMenu(true);
     }
 
@@ -78,37 +73,34 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize views
         initializeViews(view);
-
-        // Setup components
         setupRecyclerView();
         setupTabs();
         setupFAB();
-
-        // Load data
         loadInvoices();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadInvoices(); // Refresh when returning
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Clean up drawer listener
         if (drawerLayout != null && drawerToggle != null) {
             drawerLayout.removeDrawerListener(drawerToggle);
         }
     }
-
-    // ==================== INITIALIZATION ====================
 
     private void initializeViews(View view) {
         tabLayout = view.findViewById(R.id.tabLayout);
         recyclerView = view.findViewById(R.id.rv_invoices);
         fabAddInvoice = view.findViewById(R.id.fab_add_invoice);
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
+       // progressBar = view.findViewById(R.id.progressBar); // Add if you have one
     }
-
-
 
     private void setupRecyclerView() {
         adapter = new InvoiceAdapter(this);
@@ -120,28 +112,16 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                switch (position) {
-                    case 0: currentFilter = "Unpaid"; break;
-                    case 1: currentFilter = "Paid"; break;
-                    case 2: currentFilter = "Sales"; break;
-                    case 3: currentFilter = "Purchase"; break;
-                    case 4: currentFilter = "All"; break;
-                }
-                applyFiltersAndSort();
+                currentFilter = tab.getText().toString();
+                applyFiltersAndSort(); // Just filter locally, don't re-fetch
             }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
     private void setupFAB() {
         fabAddInvoice.setOnClickListener(v -> {
-            // Navigate to Add Invoice screen
             NavHostFragment.findNavController(InvoiceFragment.this)
                     .navigate(R.id.action_invoices_to_addInvoice);
         });
@@ -150,24 +130,122 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
     // ==================== DATA LOADING ====================
 
     private void loadInvoices() {
-        // TODO: Replace with actual database/API call
-        allInvoices = getSampleInvoices();
-        filteredInvoices = new ArrayList<>();
+        android.util.Log.d("INVOICES_DEBUG", "=== Loading invoices ===");
 
-        // Apply filters and sort
-        applyFiltersAndSort();
+        // Show loading indicator
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+
+        // FIXED: Get user ID from SessionManager instead of hardcoded value
+        SessionManager session = new SessionManager(requireContext());
+        int userId = session.getUserId();
+
+        android.util.Log.d("INVOICES_DEBUG", "User ID: " + userId);
+
+        // Load ALL invoices, filter locally
+        ApiClient.getInvoices(requireContext(), 0, null, null, new ApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                android.util.Log.d("INVOICES_DEBUG", "API Response: " + response.toString());
+
+                if (!isAdded()) return;
+
+                try {
+                    List<Invoice> fetchedInvoices = new ArrayList<>();
+
+                    if (response.has("data") && !response.isNull("data")) {
+                        JSONArray data = response.getJSONArray("data");
+                        android.util.Log.d("INVOICES_DEBUG", "Found " + data.length() + " invoices");
+
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject obj = data.getJSONObject(i);
+
+                            // Parse invoice - handle both lowercase and uppercase field names
+                            String invoiceId = obj.optString("invoice_id", obj.optString("InvoiceID", "0"));
+                            String invoiceNumber = obj.optString("invoice_number", obj.optString("InvoiceNumber", ""));
+                            String partnerName = obj.optString("partner_name", obj.optString("PartnerName", "Unknown"));
+                            long partnerId = obj.optLong("partner_id", obj.optLong("PartnerID", 0));
+                            double totalAmount = obj.optDouble("total_amount", obj.optDouble("TotalAmount", 0.0));
+                            String status = obj.optString("status", obj.optString("Status", "Unpaid"));
+                            String type = obj.optString("type", obj.optString("Type", "Sales"));
+                            String invoiceDate = obj.optString("invoice_date", obj.optString("InvoiceDate", ""));
+                            String dueDate = obj.optString("due_date", obj.optString("DueDate", ""));
+
+                            android.util.Log.d("INVOICES_DEBUG", "Invoice: " + invoiceNumber + " | " + partnerName + " | " + totalAmount);
+
+                            // Create Invoice object
+                            Invoice invoice = new Invoice(
+                                    invoiceId,
+                                    invoiceNumber,
+                                    partnerName,
+                                    partnerId,
+                                    0, 0, // dates as millis (parse if needed)
+                                    totalAmount, 0, totalAmount,
+                                    0, totalAmount,
+                                    status,
+                                    type,
+                                    0, 0,
+                                    false, 0,
+                                    ""
+                            );
+
+                            fetchedInvoices.add(invoice);
+                        }
+                    } else {
+                        android.util.Log.d("INVOICES_DEBUG", "No 'data' field in response");
+                    }
+
+                    // Update UI on main thread
+                    requireActivity().runOnUiThread(() -> {
+                        if (progressBar != null) progressBar.setVisibility(View.GONE);
+
+                        allInvoices.clear();
+                        allInvoices.addAll(fetchedInvoices);
+
+                        android.util.Log.d("INVOICES_DEBUG", "Total invoices loaded: " + allInvoices.size());
+
+                        applyFiltersAndSort();
+                    });
+
+                } catch (Exception e) {
+                    android.util.Log.e("INVOICES_DEBUG", "Parse error: " + e.getMessage());
+                    e.printStackTrace();
+
+                    requireActivity().runOnUiThread(() -> {
+                        if (progressBar != null) progressBar.setVisibility(View.GONE);
+                        Toast.makeText(requireContext(), "Error parsing invoices", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                android.util.Log.e("INVOICES_DEBUG", "API Error: " + error);
+
+                if (!isAdded()) return;
+
+                requireActivity().runOnUiThread(() -> {
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    Toast.makeText(requireContext(), "Failed to load: " + error, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     private void applyFiltersAndSort() {
-        // Step 1: Filter by tab
+        // FIXED: Null checks
+        if (allInvoices == null) {
+            allInvoices = new ArrayList<>();
+        }
+        if (filteredInvoices == null) {
+            filteredInvoices = new ArrayList<>();
+        }
+
         filterInvoicesByTab();
 
-        // Step 2: Apply search if there's a query
         if (!currentSearchQuery.isEmpty()) {
             applySearch();
         }
 
-        // Step 3: Sort the results
         sortInvoices(currentSortBy);
     }
 
@@ -179,19 +257,20 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
             switch (currentFilter) {
                 case "Unpaid":
-                    matches = invoice.getStatus().equals("Unpaid") ||
-                            invoice.getStatus().equals("Partially Paid");
+                    matches = "Unpaid".equals(invoice.getStatus()) ||
+                            "Partially Paid".equals(invoice.getStatus());
                     break;
                 case "Paid":
-                    matches = invoice.getStatus().equals("Paid");
+                    matches = "Paid".equals(invoice.getStatus());
                     break;
                 case "Sales":
-                    matches = invoice.getType().equals("Sales");
+                    matches = "Sales".equals(invoice.getType());
                     break;
                 case "Purchase":
-                    matches = invoice.getType().equals("Purchase");
+                    matches = "Purchase".equals(invoice.getType());
                     break;
                 case "All":
+                default:
                     matches = true;
                     break;
             }
@@ -200,14 +279,17 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
                 filteredInvoices.add(invoice);
             }
         }
+
+        android.util.Log.d("INVOICES_DEBUG", "Filtered to " + filteredInvoices.size() + " invoices for: " + currentFilter);
     }
 
     private void applySearch() {
+        if (currentSearchQuery.isEmpty()) return;
+
         List<Invoice> searchResults = new ArrayList<>();
         String query = currentSearchQuery.toLowerCase();
 
         for (Invoice invoice : filteredInvoices) {
-            // Search in multiple fields
             boolean matchesInvoiceNumber = invoice.getInvoiceNumber().toLowerCase().contains(query);
             boolean matchesPartnerName = invoice.getPartnerName().toLowerCase().contains(query);
             boolean matchesAmount = String.valueOf(invoice.getTotal()).contains(query);
@@ -218,28 +300,56 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
             }
         }
 
-        filteredInvoices = searchResults;
+        filteredInvoices.clear();
+        filteredInvoices.addAll(searchResults);
+    }
+
+    private void sortInvoices(String sortBy) {
+        switch (sortBy) {
+            case "name":
+                Collections.sort(filteredInvoices, (i1, i2) ->
+                        i1.getPartnerName().compareToIgnoreCase(i2.getPartnerName()));
+                break;
+            case "date":
+                Collections.sort(filteredInvoices, (i1, i2) ->
+                        Long.compare(i2.getIssueDateMillis(), i1.getIssueDateMillis()));
+                break;
+            case "amount":
+                Collections.sort(filteredInvoices, (i1, i2) ->
+                        Double.compare(i2.getTotal(), i1.getTotal()));
+                break;
+        }
+
+        updateUI();
+    }
+
+    private void updateUI() {
+        adapter.setInvoices(filteredInvoices);
+        updateEmptyState();
+    }
+
+    private void updateEmptyState() {
+        if (filteredInvoices == null || filteredInvoices.isEmpty()) {
+            if (layoutEmptyState != null) layoutEmptyState.setVisibility(View.VISIBLE);
+            if (recyclerView != null) recyclerView.setVisibility(View.GONE);
+        } else {
+            if (layoutEmptyState != null) layoutEmptyState.setVisibility(View.GONE);
+            if (recyclerView != null) recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
     // ==================== OPTIONS MENU ====================
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        // Clear any existing menu items
         menu.clear();
-
-        // Inflate the menu
         inflater.inflate(R.menu.menu_invoices, menu);
 
-        // Setup Search
         MenuItem searchItem = menu.findItem(R.id.action_search);
         if (searchItem != null) {
             SearchView searchView = (SearchView) searchItem.getActionView();
-
             if (searchView != null) {
                 searchView.setQueryHint("Search invoices...");
-                searchView.setMaxWidth(Integer.MAX_VALUE);
-
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
@@ -253,12 +363,6 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
                         return true;
                     }
                 });
-
-                // Handle search view close
-                searchView.setOnCloseListener(() -> {
-                    performSearch("");
-                    return false;
-                });
             }
         }
 
@@ -267,12 +371,10 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Handle drawer toggle
         if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
-        // Handle menu item clicks
         int id = item.getItemId();
 
         if (id == R.id.sort_by_name) {
@@ -280,219 +382,37 @@ public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoic
             applyFiltersAndSort();
             Toast.makeText(getContext(), "Sorted by Partner Name", Toast.LENGTH_SHORT).show();
             return true;
-
         } else if (id == R.id.sort_by_date) {
             currentSortBy = "date";
             applyFiltersAndSort();
-            Toast.makeText(getContext(), "Sorted by Date (Newest First)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Sorted by Date", Toast.LENGTH_SHORT).show();
             return true;
-
         } else if (id == R.id.sort_by_amount) {
             currentSortBy = "amount";
             applyFiltersAndSort();
-            Toast.makeText(getContext(), "Sorted by Amount (Highest First)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Sorted by Amount", Toast.LENGTH_SHORT).show();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    // ==================== SEARCH FUNCTIONALITY ====================
-
     private void performSearch(String query) {
         currentSearchQuery = query;
         applyFiltersAndSort();
-    }
-
-    // ==================== SORT FUNCTIONALITY ====================
-
-    private void sortInvoices(String sortBy) {
-        switch (sortBy) {
-            case "name":
-                Collections.sort(filteredInvoices, new Comparator<Invoice>() {
-                    @Override
-                    public int compare(Invoice i1, Invoice i2) {
-                        return i1.getPartnerName().compareToIgnoreCase(i2.getPartnerName());
-                    }
-                });
-                break;
-
-            case "date":
-                Collections.sort(filteredInvoices, new Comparator<Invoice>() {
-                    @Override
-                    public int compare(Invoice i1, Invoice i2) {
-                        // Newest first
-                        return Long.compare(i2.getIssueDateMillis(), i1.getIssueDateMillis());
-                    }
-                });
-                break;
-
-            case "amount":
-                Collections.sort(filteredInvoices, new Comparator<Invoice>() {
-                    @Override
-                    public int compare(Invoice i1, Invoice i2) {
-                        // Highest first
-                        return Double.compare(i2.getTotal(), i1.getTotal());
-                    }
-                });
-                break;
-        }
-
-        // Update UI
-        updateUI();
-    }
-
-    // ==================== UI UPDATE ====================
-
-    private void updateUI() {
-        adapter.setInvoices(filteredInvoices);
-        updateEmptyState();
-    }
-
-    private void updateEmptyState() {
-        if (filteredInvoices.isEmpty()) {
-            layoutEmptyState.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            layoutEmptyState.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
     }
 
     // ==================== INVOICE CLICK LISTENERS ====================
 
     @Override
     public void onInvoiceClick(Invoice invoice) {
-        // TODO: Navigate to invoice details or show options
-        Toast.makeText(requireContext(),
-                "Invoice: " + invoice.getInvoiceNumber(),
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Invoice: " + invoice.getInvoiceNumber(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onMarkAsPaidClick(Invoice invoice) {
-        // Mark invoice as paid
         invoice.markAsPaid();
-
-        // TODO: Update in database/API
-
-        // Refresh display
         applyFiltersAndSort();
-
-        // Show confirmation
-        Snackbar.make(requireView(),
-                invoice.getInvoiceNumber() + " marked as paid!",
-                Snackbar.LENGTH_SHORT).show();
-    }
-
-    // ==================== SAMPLE DATA ====================
-
-    private List<Invoice> getSampleInvoices() {
-        List<Invoice> invoices = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-
-        // Sample Invoice 1 - Sales, Unpaid, Overdue
-        cal.set(2024, Calendar.DECEMBER, 1);
-        long issue1 = cal.getTimeInMillis();
-        cal.set(2024, Calendar.DECEMBER, 15);
-        long due1 = cal.getTimeInMillis();
-
-        invoices.add(new Invoice(
-                "1", "INV-0001", "ABC Company", 1,
-                issue1, due1,
-                1500.00, 0.00, 1500.00,
-                0.00, 1500.00,
-                "Unpaid", "Sales",
-                10.0, 150.0,
-                true, 15,
-                ""
-        ));
-
-        // Sample Invoice 2 - Purchase, Paid
-        cal.set(2024, Calendar.NOVEMBER, 10);
-        long issue2 = cal.getTimeInMillis();
-        cal.set(2024, Calendar.DECEMBER, 10);
-        long due2 = cal.getTimeInMillis();
-
-        invoices.add(new Invoice(
-                "2", "INV-0002", "XYZ Suppliers", 2,
-                issue2, due2,
-                2500.00, 0.00, 2500.00,
-                2500.00, 0.00,
-                "Paid", "Purchase",
-                25.0, 100.0,
-                false, 0,
-                ""
-        ));
-
-        // Sample Invoice 3 - Sales, Unpaid
-        cal.set(2024, Calendar.DECEMBER, 20);
-        long issue3 = cal.getTimeInMillis();
-        cal.set(2025, Calendar.JANUARY, 20);
-        long due3 = cal.getTimeInMillis();
-
-        invoices.add(new Invoice(
-                "3", "INV-0003", "Tech Corp", 3,
-                issue3, due3,
-                3200.50, 0.00, 3200.50,
-                0.00, 3200.50,
-                "Unpaid", "Sales",
-                20.0, 160.025,
-                false, 0,
-                ""
-        ));
-
-        // Sample Invoice 4 - Purchase, Partially Paid, Overdue
-        cal.set(2024, Calendar.NOVEMBER, 25);
-        long issue4 = cal.getTimeInMillis();
-        cal.set(2024, Calendar.DECEMBER, 25);
-        long due4 = cal.getTimeInMillis();
-
-        invoices.add(new Invoice(
-                "4", "INV-0004", "Office Supplies Ltd", 4,
-                issue4, due4,
-                5000.00, 0.00, 5000.00,
-                2500.00, 2500.00,
-                "Partially Paid", "Purchase",
-                50.0, 100.0,
-                true, 5,
-                ""
-        ));
-
-        // Sample Invoice 5 - Sales, Paid
-        cal.set(2024, Calendar.DECEMBER, 15);
-        long issue5 = cal.getTimeInMillis();
-        cal.set(2025, Calendar.JANUARY, 15);
-        long due5 = cal.getTimeInMillis();
-
-        invoices.add(new Invoice(
-                "5", "INV-0005", "Green Solutions", 5,
-                issue5, due5,
-                1200.00, 0.00, 1200.00,
-                1200.00, 0.00,
-                "Paid", "Sales",
-                8.0, 150.0,
-                false, 0,
-                ""
-        ));
-
-        // Sample Invoice 6 - Sales, Unpaid
-        cal.set(2024, Calendar.DECEMBER, 28);
-        long issue6 = cal.getTimeInMillis();
-        cal.set(2025, Calendar.JANUARY, 28);
-        long due6 = cal.getTimeInMillis();
-
-        invoices.add(new Invoice(
-                "6", "INV-0006", "Blue Ocean Inc", 6,
-                issue6, due6,
-                800.00, 0.00, 800.00,
-                0.00, 800.00,
-                "Unpaid", "Sales",
-                5.0, 160.0,
-                false, 0,
-                ""
-        ));
-
-        return invoices;
+        Snackbar.make(requireView(), invoice.getInvoiceNumber() + " marked as paid!", Snackbar.LENGTH_SHORT).show();
     }
 }

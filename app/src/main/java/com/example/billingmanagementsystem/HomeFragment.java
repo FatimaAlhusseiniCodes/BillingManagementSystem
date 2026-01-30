@@ -109,18 +109,23 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadUpcomingPayments() {
-        SessionManager session = new SessionManager(getContext());
-        int userId = session.getUserId();
+        android.util.Log.d("HOME_DEBUG", "=== Loading Upcoming Payments ===");
 
-        ApiClient.getInvoices(getContext(), userId, "Purchase", "Unpaid", new ApiClient.ApiCallback() {
+        // Don't filter by userId since we removed that requirement
+        ApiClient.getInvoices(getContext(), 0, "Purchase", "Unpaid", new ApiClient.ApiCallback() {
             @Override
             public void onSuccess(JSONObject response) {
+                android.util.Log.d("HOME_DEBUG", "Payments Response: " + response.toString());
+
                 if (!isAdded()) return;
 
                 try {
-                    if (response.getBoolean("success")) {
+                    List<UpcomingPayment> payments = new ArrayList<>();
+
+                    // Check for data array
+                    if (response.has("data") && !response.isNull("data")) {
                         JSONArray data = response.getJSONArray("data");
-                        List<UpcomingPayment> payments = new ArrayList<>();
+                        android.util.Log.d("HOME_DEBUG", "Found " + data.length() + " unpaid purchases");
 
                         for (int i = 0; i < data.length(); i++) {
                             JSONObject item = data.getJSONObject(i);
@@ -140,25 +145,24 @@ public class HomeFragment extends Fragment {
 
                             payments.add(new UpcomingPayment(supplierName, invoiceNumber, amount, dueDate));
                         }
-
-                        Collections.sort(payments, new Comparator<UpcomingPayment>() {
-                            @Override
-                            public int compare(UpcomingPayment p1, UpcomingPayment p2) {
-                                return p1.dueDate.compareTo(p2.dueDate);
-                            }
-                        });
-
-                        displayUpcomingPayments(payments);
                     }
+
+                    // Sort by due date
+                    Collections.sort(payments, (p1, p2) -> p1.dueDate.compareTo(p2.dueDate));
+
+                    requireActivity().runOnUiThread(() -> displayUpcomingPayments(payments));
+
                 } catch (JSONException e) {
-                    displayUpcomingPayments(new ArrayList<>());
+                    android.util.Log.e("HOME_DEBUG", "Parse error: " + e.getMessage());
+                    requireActivity().runOnUiThread(() -> displayUpcomingPayments(new ArrayList<>()));
                 }
             }
 
             @Override
             public void onError(String error) {
+                android.util.Log.e("HOME_DEBUG", "Payments Error: " + error);
                 if (!isAdded()) return;
-                displayUpcomingPayments(new ArrayList<>());
+                requireActivity().runOnUiThread(() -> displayUpcomingPayments(new ArrayList<>()));
             }
         });
     }
@@ -210,6 +214,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadProfitData() {
+        android.util.Log.d("HOME_DEBUG", "=== Loading Profit Data ===");
+
         SessionManager session = new SessionManager(getContext());
         int userId = session.getUserId();
 
@@ -219,6 +225,7 @@ public class HomeFragment extends Fragment {
 
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        if (userId <= 0) userId = 1;
 
         for (int i = 0; i < totalMonths; i++) {
             cal.add(Calendar.MONTH, -1);
@@ -233,33 +240,46 @@ public class HomeFragment extends Fragment {
 
             final Date monthDate = startCal.getTime();
 
+            android.util.Log.d("HOME_DEBUG", "Fetching profit for: " + startDate + " to " + endDate);
+
             ApiClient.calculateProfit(getContext(), userId, startDate, endDate, new ApiClient.ApiCallback() {
                 @Override
                 public void onSuccess(JSONObject response) {
                     if (!isAdded()) return;
-
                     try {
-                        if (response.getBoolean("success")) {
-                            JSONObject data = response.getJSONObject("data");
-                            double income = data.optDouble("total_revenue", 0.0);
-                            double expenses = data.optDouble("total_expenses", 0.0);
+                        // 1. Check if success is true
+                        if (response.optBoolean("success", false) && response.has("data")) {
 
-                            profits.add(new MonthlyProfit(monthDate, income, expenses));
+                            // 2. CRITICAL: Get the inner "data" object
+                            JSONObject dataObject = response.getJSONObject("data");
+
+                            // 3. Extract the values using optDouble (handles both String and Double)
+                            double income = dataObject.optDouble("total_revenue", 0.0);
+                            double expenses = dataObject.optDouble("total_expenses", 0.0);
+
+                            android.util.Log.d("HOME_DEBUG", "Parsed Income: " + income + ", Expenses: " + expenses);
+
+                            synchronized (profits) {
+                                profits.add(new MonthlyProfit(monthDate, income, expenses));
+                            }
                         }
-                    } catch (JSONException ignored) { }
-
-                    monthsCompleted[0]++;
-                    if (monthsCompleted[0] == totalMonths) {
-                        displayProfitData(profits);
+                    } catch (JSONException e) {
+                        android.util.Log.e("HOME_DEBUG", "JSON Parse error: " + e.getMessage());
                     }
+                    // ... rest of your synchronized logic
                 }
 
                 @Override
                 public void onError(String error) {
+                    android.util.Log.e("HOME_DEBUG", "Profit Error: " + error);
+
                     if (!isAdded()) return;
-                    monthsCompleted[0]++;
-                    if (monthsCompleted[0] == totalMonths) {
-                        displayProfitData(profits);
+
+                    synchronized (monthsCompleted) {
+                        monthsCompleted[0]++;
+                        if (monthsCompleted[0] == totalMonths) {
+                            requireActivity().runOnUiThread(() -> displayProfitData(profits));
+                        }
                     }
                 }
             });

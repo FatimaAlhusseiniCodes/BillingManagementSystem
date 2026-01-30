@@ -19,7 +19,7 @@ public class ApiConfig {
      * - Use your actual domain or server IP
      */
     // For physical device:
-    private static final String BASE_URL = "http://192.168.1.106/billing_api/";
+    private static final String BASE_URL = "http://10.220.187.41/billing_api/";
     // For production: private static final String BASE_URL = "https://yourdomain.com/billing_api/";
 
     // ==================== USER ENDPOINTS ====================

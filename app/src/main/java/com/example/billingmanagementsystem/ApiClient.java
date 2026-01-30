@@ -162,15 +162,18 @@ public class ApiClient {
     // ==================== PARTNERS API ====================
 
     /**
-     * Get all partners
+     * Get partners by type
      */
     public static void getPartners(Context context, String type, ApiCallback callback) {
         String url = type != null && !type.isEmpty()
                 ? ApiConfig.buildUrl(ApiConfig.READ_PARTNERS, "type", type)
                 : ApiConfig.READ_PARTNERS;
+
+        // DEBUG: Log the URL being called
+        Log.d("API_DEBUG", "getPartners URL: " + url);
+
         get(context, url, callback);
     }
-
     /**
      * Get single partner
      */
@@ -364,10 +367,12 @@ public class ApiClient {
     public static void calculateProfit(Context context, int userId, String startDate, String endDate, ApiCallback callback) {
         try {
             JSONObject params = new JSONObject();
+            // These keys MUST match the $data->key names in your calculate.php
             params.put("user_id", userId);
             params.put("period_start", startDate);
             params.put("period_end", endDate);
 
+            // Your php file has header("Access-Control-Allow-Methods: POST")
             post(context, ApiConfig.CALCULATE_PROFIT, params, callback);
         } catch (JSONException e) {
             callback.onError("Failed to create request: " + e.getMessage());
