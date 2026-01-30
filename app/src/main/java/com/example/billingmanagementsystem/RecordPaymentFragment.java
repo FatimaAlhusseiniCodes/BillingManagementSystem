@@ -2,12 +2,10 @@ package com.example.billingmanagementsystem;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -22,46 +20,26 @@ public class RecordPaymentFragment extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
+
         binding = FragmentRecordPaymentBinding.inflate(inflater, container, false);
         return binding.getRoot();
+
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        setHasOptionsMenu(true);
-
-        binding.btnAdd.setOnClickListener(v -> {
-            NavHostFragment.findNavController(RecordPaymentFragment.this)
-                    .navigate(R.id.action_recordPaymentFragment_to_newCustomerFragment);
-        });
-
-        binding.etCustomer.setOnEditorActionListener((v, actionId, event) -> {
-            String name = binding.etCustomer.getText().toString();
-
-            if (!name.isEmpty()) {
-                Bundle bundle = new Bundle();
-                bundle.putString("customerName", name);
-
-                Navigation.findNavController(view).navigate(R.id.action_recordPayment_to_customerDetails, bundle);
-                return true;
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (item.getItemId() == android.R.id.home) {
-
+        binding.toolbarRecord.setNavigationOnClickListener(v -> {
             leaveDialog dialog = new leaveDialog();
             dialog.show(getParentFragmentManager(), "default");
+        });
 
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        binding.btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavHostFragment.findNavController(RecordPaymentFragment.this)
+                        .navigate(R.id.action_recordPaymentFragment_to_addPartnerFragment);
+            }
+        });
     }
 
     @Override
@@ -69,4 +47,5 @@ public class RecordPaymentFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }
