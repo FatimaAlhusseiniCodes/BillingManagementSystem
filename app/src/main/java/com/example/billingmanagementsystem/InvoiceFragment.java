@@ -34,6 +34,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class InvoiceFragment extends Fragment implements InvoiceAdapter.OnInvoiceClickListener {
+/**
+ * InvoiceFragment - Complete implementation with Toolbar, Search, Sort, and Drawer
+ * Displays invoices with filtering, searching, and sorting capabilities
+ */
 
     // UI Components
     private TabLayout tabLayout;

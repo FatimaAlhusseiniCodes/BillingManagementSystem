@@ -20,14 +20,14 @@ import java.util.Locale;
  * Adapter for Invoice RecyclerView
  * Handles displaying invoices and "Mark as Paid" button
  */
-public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceViewHolder> {
+public class Invoiceadapter extends RecyclerView.Adapter<Invoiceadapter.InvoiceViewHolder> {
 
     private List<Invoice> invoiceList = new ArrayList<>();
     private OnInvoiceClickListener listener;
     private DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
-    public InvoiceAdapter(OnInvoiceClickListener listener) {
+    public Invoiceadapter(OnInvoiceClickListener listener) {
         this.listener = listener;
     }
 
